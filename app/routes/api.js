@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
 const google = require("../google/google")
+const calendar = require("../google/services/calendar")
 
 
 router.get("/login", (req, res) => {
@@ -9,15 +10,24 @@ router.get("/login", (req, res) => {
 	res.redirect(consent_url)
 })
 
-router.get("/", (req, res) => {
-	let code = req.query.code
-	google.setToken(code)
-	res.send(code)
+router.get("/", async (req, res) => {
+	try {
+		let code = req.query.code
+		await google.setToken(code)
+		res.redirect("/calendar")
+	} catch (error) {
+		res.send(error)
+	}
 })
 
-router.get("/calendar", (req, res) => {
-	google.getCalendarList()
-	res.send("OK")
+router.get("/calendar", async (req, res) => {
+	try {
+		let events = await calendar.getCalendarEvents()
+		console.log(events)
+		res.send(events)
+	} catch (error) {
+		res.send(error)
+	}
 })
 
 

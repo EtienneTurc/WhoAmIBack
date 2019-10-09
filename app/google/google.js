@@ -7,35 +7,21 @@ const oauth2Client = new google.auth.OAuth2(
 	config.redirect_url
 );
 
-const calendar = google.calendar({
-	version: 'v3',
-	auth: oauth2Client
-});
-
-// generate a url that asks permissions for Blogger and Google Calendar scopes
-const scopes = [
-	// 	'https://www.googleapis.com/auth/blogger',
-	'https://www.googleapis.com/auth/calendar'
-];
-
-exports.getConsentUrl = function () {
+// generate a url that asks permissions the given scopes
+function getConsentUrl() {
 	return oauth2Client.generateAuthUrl({
 		// 'online' (default) or 'offline' (gets refresh_token)
 		access_type: 'offline',
 
 		// If you only need one scope you can pass it as a string
-		scope: scopes
+		scope: config.scopes
 	});
 }
 
-exports.setToken = async function (code) {
+// Set the tokens
+async function setToken(code) {
 	const { tokens } = await oauth2Client.getToken(code)
 	oauth2Client.setCredentials(tokens);
 }
 
-exports.getCalendarList = async function () {
-	const res = await calendar.calendarList.list({
-		Authorization: oauth2Client.access_token
-	});
-	console.log(res.data);
-}
+module.exports = { oauth2Client, getConsentUrl, setToken }

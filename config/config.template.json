@@ -3,5 +3,8 @@
 	"clientSecret": "clientID",
 	"url": "http://locahost:8080",
 	"redirect_url": "https://local-redirect.data-ensta.fr?port=8080",
-	"port": 8080
+	"port": 8080,
+	"scopes": [
+		"https://www.googleapis.com/auth/calendar"
+	]
 }
