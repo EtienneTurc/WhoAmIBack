@@ -13,15 +13,14 @@ exports.getCalendarEvents = async function () {
 		});
 
 		let calendarList = res.data.items
-		console.log(calendarList)
-		let events = []
+		let eventsPromises = []
 		for (let cal of calendarList) {
-			let e = await calendar.events.list({
+			eventsPromises.push(calendar.events.list({
 				Authorization: oauth2Client.access_token,
 				calendarId: cal.id
-			});
-			events.push(e)
+			}))
 		}
+		let events = await Promise.all(eventsPromises)
 		return events
 	} catch (error) {
 		console.log(error)
