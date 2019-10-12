@@ -1,11 +1,12 @@
 {
-	"clientID": "clientID",
-	"clientSecret": "clientID",
-	"url": "http://locahost:8080",
-	"redirect_url": "https://local-redirect.data-ensta.fr?port=8080",
-	"port": 8080,
+	"clientID": "cleintID",
+	"clientSecret": "clientSecret",
+	"url": "http://locahost:8001",
+	"front_url": "http://localhost:8080",
+	"redirect_url": "https://local-redirect.data-ensta.fr/?port=8080",
+	"port": 8001,
 	"scopes": [
-		"https://www.googleapis.com/auth/calendar",
+		"https://www.googleapis.com/auth/calendar.readonly",
 		"https://www.googleapis.com/auth/drive.readonly"
 	]
 }

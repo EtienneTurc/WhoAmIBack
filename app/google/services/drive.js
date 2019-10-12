@@ -20,7 +20,6 @@ exports.getDriveFiles = async function () {
 				fileId: f.id,
 				fields: ["exportLinks", "webContentLink"]
 			}))
-			// console.log(links)
 		}
 		filesLinks = await Promise.all(filesLinksPromises)
 		return filesLinks

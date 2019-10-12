@@ -19,9 +19,15 @@ function getConsentUrl() {
 }
 
 // Set the tokens
-async function setToken(code) {
-	const { tokens } = await oauth2Client.getToken(code)
-	oauth2Client.setCredentials(tokens);
+async function setToken(req, res, next) {
+	try {
+		const { tokens } = await oauth2Client.getToken(req.headers.code)
+		oauth2Client.setCredentials(tokens);
+		next()
+	} catch (err) {
+		console.log(err)
+		res.send(err)
+	}
 }
 
 module.exports = { oauth2Client, getConsentUrl, setToken }
