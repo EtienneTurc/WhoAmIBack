@@ -14,7 +14,7 @@ router.get("/calendar", async (req, res) => {
 		events = events.map(e =>
 			e.data.items
 		)
-		res.send(events)
+		res.send({ "events": events, token: res.locals.token })
 	} catch (error) {
 		res.send(error)
 	}
