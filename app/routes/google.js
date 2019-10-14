@@ -1,11 +1,18 @@
 const router = require('express').Router()
 
-const config = require("../../config/config.json")
-const URL = require('url').URL
-
-const google = require("../google/google")
 const calendar = require("../google/services/calendar")
 const drive = require("../google/services/drive")
+const people = require("../google/services/people")
+
+
+router.get("/people", async (req, res) => {
+	try {
+		let people_info = await people.getPeopleInformation()
+		res.send(people_info)
+	} catch (error) {
+		res.send(error)
+	}
+})
 
 
 router.get("/calendar", async (req, res) => {
