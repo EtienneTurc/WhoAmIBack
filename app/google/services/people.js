@@ -8,14 +8,10 @@ const people = google.people({
 
 const information = ["addresses",
 	"ageRanges",
-	"birthdays",
-	"coverPhotos",
 	"emailAddresses",
 	"genders",
 	"names",
-	"nicknames",
 	"phoneNumbers",
-	"photos",
 ]
 
 exports.getPeopleInformation = async function () {
@@ -25,7 +21,6 @@ exports.getPeopleInformation = async function () {
 			personFields: information,
 			resourceName: "people/me"
 		});
-
 		console.log(res)
 		return res
 	} catch (error) {
