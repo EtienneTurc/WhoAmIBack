@@ -4,6 +4,7 @@ const calendar = require("../google/services/calendar")
 const drive = require("../google/services/drive")
 const people = require("../google/services/people")
 
+const { saveCalendar } = require("../utils/calendar")
 
 router.get("/people", async (req, res) => {
 	try {
@@ -16,11 +17,13 @@ router.get("/people", async (req, res) => {
 
 
 router.get("/calendar", async (req, res) => {
+
 	try {
 		let events = await calendar.getCalendarEvents()
 		events = events.map(e =>
 			e.data.items
-		)
+		).flat()
+		saveCalendar("calendar_azoulai.txt", events)
 		res.send({ "events": events, token: res.locals.token })
 	} catch (error) {
 		res.send(error)
