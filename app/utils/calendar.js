@@ -4,7 +4,6 @@ const fs = require('fs');
 let filterCalendar = (events) => {
 
 	let filtered = []
-	console.log(events.length)
 	events.forEach(e => {
 		filtered.push({
 			"summary": e.summary,
@@ -20,9 +19,7 @@ let filterCalendar = (events) => {
 
 exports.saveCalendar = async (file_name, events) => {
 	let filtered = filterCalendar(events)
-	console.log(filtered)
 	await fs.writeFile(file_name, JSON.stringify(filtered), function (err) {
-
 		if (err) {
 			console.log(err);
 		}

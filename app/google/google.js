@@ -18,13 +18,15 @@ function getConsentUrl() {
 	});
 }
 
+// function getToken(code) {
+// 	return oauth2Client.getToken(code)
+// }
+
 // Set the token
 async function setToken(req, res, next) {
 	try {
-		if (!req.headers.token && req.headers.code) {
-			const { tokens } = await oauth2Client.getToken(req.headers.code)
-			oauth2Client.setCredentials(tokens);
-			res.locals.token = tokens
+		if (!req.headers.token) {
+			res.sendStatus(401) // Unauthorized
 		} else {
 			oauth2Client.setCredentials(JSON.parse(req.headers.token));
 		}

@@ -11,4 +11,18 @@ router.get("/google", (req, res) => {
 	res.send(consent_url)
 })
 
+router.get("/googleToken", async (req, res) => {
+	try {
+		let { tokens } = await google.oauth2Client.getToken(req.query.code)
+		if (tokens) {
+			res.send(tokens)
+		} else {
+			res.sendStatus(401)
+		}
+	} catch (err) {
+		console.log(err)
+		res.sendStatus(401)
+	}
+})
+
 module.exports = router
