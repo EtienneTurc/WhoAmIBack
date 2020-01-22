@@ -3,13 +3,14 @@ const router = require('express').Router()
 const calendar = require("../google/services/calendar")
 const drive = require("../google/services/drive")
 const people = require("../google/services/people")
+const gmail = require("../google/services/gmail")
 
 const { saveCalendar } = require("../utils/calendar")
 
 router.get("/people", async (req, res) => {
 	try {
-		let people_info = await people.getPeopleInformation()
-		res.send(people_info)
+		let peopleInfo = await people.getPeopleInformation()
+		res.send(peopleInfo)
 	} catch (error) {
 		res.send(error)
 	}
@@ -17,14 +18,12 @@ router.get("/people", async (req, res) => {
 
 
 router.get("/calendar", async (req, res) => {
-
 	try {
 		let events = await calendar.getCalendarEvents()
-		events = events.map(e =>
-			e.data.items
-		).flat()
-		saveCalendar("calendar_azoulai.txt", events)
-		res.send({ "events": events, token: res.locals.token })
+		// Keeps only the events and concatenate them
+		events = events.reduce((acc, e) => acc.concat(e.data.items), [])
+		// saveCalendar("calendar.txt", events)
+		res.send({ "events": events })
 	} catch (error) {
 		res.send(error)
 	}
@@ -34,6 +33,15 @@ router.get("/drive", async (req, res) => {
 	try {
 		let filesLinks = await drive.getDriveFiles()
 		res.send(filesLinks)
+	} catch (error) {
+		res.send(error)
+	}
+})
+
+router.get("/gmail", async (req, res) => {
+	try {
+		let messages = await gmail.getMails()
+		res.send(messages)
 	} catch (error) {
 		res.send(error)
 	}

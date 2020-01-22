@@ -21,7 +21,6 @@ exports.getPeopleInformation = async function () {
 			personFields: information,
 			resourceName: "people/me"
 		});
-		console.log(res)
 		return res
 	} catch (error) {
 		console.log(error)

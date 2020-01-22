@@ -1,9 +1,11 @@
 {
+	"sessionSecret": "Youplaboum",
+	"storeSecret": "Badaboum",
 	"clientID": "cleintID",
 	"clientSecret": "clientSecret",
 	"url": "http://locahost:8001",
-	"front_url": "http://localhost:8080",
-	"redirect_url": "https://local-redirect.data-ensta.fr/?port=8080",
+	"frontUrl": "http://localhost:8080",
+	"redirectUrl": "https://local-redirect.data-ensta.fr/code?port=8080",
 	"port": 8001,
 	"scopes": [
 		"https://www.googleapis.com/auth/calendar.readonly",
@@ -12,6 +14,7 @@
 		"https://www.googleapis.com/auth/profile.agerange.read",
 		"https://www.googleapis.com/auth/user.addresses.read",
 		"https://www.googleapis.com/auth/profile.agerange.read",
-		"https://www.googleapis.com/auth/user.emails.read"
+		"https://www.googleapis.com/auth/user.emails.read",
+		"https://www.googleapis.com/auth/gmail.readonly"
 	]
 }

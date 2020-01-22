@@ -7,13 +7,15 @@ const google = require("../google/google")
 
 
 router.get("/google", (req, res) => {
-	let consent_url = google.getConsentUrl()
-	res.send(consent_url)
+	let consentUrl = google.getConsentUrl()
+	res.send(consentUrl)
 })
 
 router.get("/googleToken", async (req, res) => {
 	try {
 		let { tokens } = await google.oauth2Client.getToken(req.query.code)
+		req.session.token = tokens
+		req.session.save()
 		if (tokens) {
 			res.send(tokens)
 		} else {
