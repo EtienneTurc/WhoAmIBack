@@ -1,6 +1,8 @@
 const { google } = require('googleapis');
 const { oauth2Client } = require('../google')
 
+const { filterCalendar } = require('../../utils/calendar')
+
 const calendar = google.calendar({
 	version: 'v3',
 	auth: oauth2Client
@@ -21,7 +23,7 @@ exports.getCalendarEvents = async function () {
 			}))
 		}
 		let events = await Promise.all(eventsPromises)
-		return events
+		return filterCalendar(events)
 	} catch (error) {
 		console.log(error)
 	}

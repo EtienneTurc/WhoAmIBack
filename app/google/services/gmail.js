@@ -2,6 +2,7 @@ const { google } = require('googleapis');
 const { oauth2Client } = require('../google')
 
 const { filterMails } = require('../../utils/gmail')
+const { saveJson } = require('../../utils/utils')
 
 const gmail = google.gmail({
 	version: 'v1',
@@ -10,25 +11,38 @@ const gmail = google.gmail({
 
 exports.getMails = async function () {
 	try {
-		var messages = await gmail.users.messages.list({
+		var messages_received = await gmail.users.messages.list({
 			'userId': "etienne.turc@gmail.com",
+			labelIds: ["INBOX"],
+			q: "category:primary",
 		});
-		let promises = []
-		// console.log(messages)
-		for (let m of messages.data.messages) {
-			promises.push(gmail.users.messages.get({
+		var messages_sent = await gmail.users.messages.list({
+			'userId': "etienne.turc@gmail.com",
+			labelIds: ["SENT"],
+		});
+
+		let promises_received = []
+		for (let m of messages_received.data.messages) {
+			promises_received.push(gmail.users.messages.get({
 				'userId': "etienne.turc@gmail.com",
 				'id': m.id,
 				'format': "full",
 			}))
 		}
-		var content = await Promise.all(promises)
-		let filtered = filterMails(content)
-		for (let p of filtered[0].parts) {
-			console.log(p)
+		let promises_sent = []
+		for (let m of messages_sent.data.messages) {
+			promises_sent.push(gmail.users.messages.get({
+				'userId': "etienne.turc@gmail.com",
+				'id': m.id,
+				'format': "full",
+			}))
 		}
-		// console.log(content[0].data.payload.parts[1].parts[0])
-		return content
+		var res = await Promise.all([Promise.all(promises_received), Promise.all(promises_sent)])
+		res[0].forEach(r => r.status = "received")
+		res[1].forEach(r => r.status = "sent")
+		let filtered = filterMails(res[0].concat(res[1]))
+		saveJson("gmail.txt", filtered)
+		return filtered
 	} catch (error) {
 		console.log(error)
 	}

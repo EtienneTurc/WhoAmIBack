@@ -18,6 +18,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "googleapis": "^43.0.0",
-    "helmet": "^3.21.2"
+    "helmet": "^3.21.2",
+    "html-to-text": "^5.1.1"
   }
 }
