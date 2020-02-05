@@ -34,7 +34,8 @@ router.get("/simple", async (req, res) => {
 	let mails_sent = result[0][1]
 	let events = result[1]
 
-	res.send({ mails: { received: { length: mails_received.length }, sent: { length: mails_sent.length } }, events: { length: events.length } })
+	// let locations = calendar.getEventLocations(ev)
 
+	res.send({ mails: { received: { length: mails_received.length }, sent: { length: mails_sent.length } }, events: { length: events.length } })
 })
 module.exports = router

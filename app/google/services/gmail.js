@@ -9,41 +9,44 @@ const gmail = google.gmail({
 	auth: oauth2Client
 });
 
-exports.getMails = async function () {
-	try {
-		var messages_received = await gmail.users.messages.list({
+async function allMails(labelIds) {
+	var res = await gmail.users.messages.list({
+		'userId': "me",
+		labelIds: labelIds,
+	});
+	mails = res.data.resultSizeEstimate ? res.data.messages : []
+	while (res.nextPageToken) {
+		res = await gmail.users.messages.list({
 			'userId': "me",
-			labelIds: ["INBOX"],
-			q: "category:primary",
+			labelIds: labelIds,
+			nextPageToken: res.nextPageToken
 		});
-		var messages_sent = await gmail.users.messages.list({
-			'userId': "me",
-			labelIds: ["SENT"],
-		});
-
-		let promises_received = []
-		console.log(messages_received)
-		for (let m of messages_received.data.messages) {
-			promises_received.push(gmail.users.messages.get({
-				'userId': "me",
-				'id': m.id,
-				'format': "full",
-			}))
-		}
-		let promises_sent = []
-		for (let m of messages_sent.data.messages) {
-			promises_sent.push(gmail.users.messages.get({
-				'userId': "me",
-				'id': m.id,
-				'format': "full",
-			}))
-		}
-		var res = await Promise.all([Promise.all(promises_received), Promise.all(promises_sent)])
-		res[0].forEach(r => r.status = "received")
-		res[1].forEach(r => r.status = "sent")
-		// saveJson("gmail.txt", filtered)
-		return [filterMails(res[0]), filterMails(res[1])]
-	} catch (error) {
-		console.log(error)
+		mails.concat(res.data.resultSizeEstimate ? res.data.messages : [])
 	}
+	return mails
+}
+
+function getMailContent(mails) {
+	let promises = []
+	for (let m of mails) {
+		promises.push(gmail.users.messages.get({
+			'userId': "me",
+			'id': m.id,
+			'format': "full",
+		}))
+	}
+	return promises
+}
+
+exports.getMails = async function () {
+	var mails_received = await allMails(["INBOX"])
+	var mails_sent = await allMails(["SENT"])
+
+	var res = await Promise.all([Promise.all(getMailContent(mails_received)), Promise.all(getMailContent(mails_sent))])
+
+	res[0].forEach(r => r.status = "received")
+	res[1].forEach(r => r.status = "sent")
+	mails = [filterMails(res[0]), filterMails(res[1])]
+	saveJson("gmail.txt", mails[0].concat(mails[1]))
+	return mails
 }
