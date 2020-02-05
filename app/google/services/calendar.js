@@ -23,6 +23,7 @@ exports.getCalendarEvents = async function () {
 			}))
 		}
 		let events = await Promise.all(eventsPromises)
+		events = events.reduce((acc, e) => acc.concat(e.data.items), [])
 		return filterCalendar(events)
 	} catch (error) {
 		console.log(error)

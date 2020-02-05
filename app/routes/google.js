@@ -8,43 +8,23 @@ const gmail = require("../google/services/gmail")
 const { saveCalendar } = require("../utils/calendar")
 
 router.get("/people", async (req, res) => {
-	try {
-		let peopleInfo = await people.getPeopleInformation()
-		res.send(peopleInfo)
-	} catch (error) {
-		res.send(error)
-	}
+	let peopleInfo = await people.getPeopleInformation()
+	res.send(peopleInfo)
 })
 
-
 router.get("/calendar", async (req, res) => {
-	try {
-		let events = await calendar.getCalendarEvents()
-		// Keeps only the events and concatenate them
-		events = events.reduce((acc, e) => acc.concat(e.data.items), [])
-		// saveCalendar("calendar.txt", events)
-		res.send({ "events": events })
-	} catch (error) {
-		res.send(error)
-	}
+	let events = await calendar.getCalendarEvents()
+	res.send(events)
 })
 
 router.get("/drive", async (req, res) => {
-	try {
-		let filesLinks = await drive.getDriveFiles()
-		res.send(filesLinks)
-	} catch (error) {
-		res.send(error)
-	}
+	let filesLinks = await drive.getDriveFiles()
+	res.send(filesLinks)
 })
 
 router.get("/gmail", async (req, res) => {
-	try {
-		let messages = await gmail.getMails()
-		res.send(messages)
-	} catch (error) {
-		res.send(error)
-	}
+	let messages = await gmail.getMails()
+	res.send(messages)
 })
 
 module.exports = router

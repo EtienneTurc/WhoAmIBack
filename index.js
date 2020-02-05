@@ -29,6 +29,14 @@ app.use(session({
 
 app.use("/login", require("./app/routes/login"))
 app.use("/google", setToken, require("./app/routes/google"))
+app.use("/analytics", setToken, require("./app/routes/analytics"))
+
+app.use((err, req, res, next) => {
+	if (res.headersSent)
+		return next(err)
+	console.error(err.status, err.message)
+	res.status(err.status || 500).json({ message: err.message || err })
+})
 
 app.listen(config.port, function () {
 	console.log("Server running on port " + config.port)

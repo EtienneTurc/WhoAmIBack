@@ -9,7 +9,6 @@ let cleanBody = str => {
 	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split("\n").join(" ").split(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g).join("").normalize("NFD").split(/[\u0300-\u036f]/g).join("").split(/  +/g).join(" ").toLowerCase()
 }
 
-
 exports.filterMails = (mails) => {
 	let filtered = []
 	let headers = ['From', 'To', 'Subject']

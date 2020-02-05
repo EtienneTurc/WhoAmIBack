@@ -14,7 +14,9 @@ exports.getDriveFiles = async function () {
 
 		let driveFiles = res.data.files
 		let filesLinksPromises = []
-		for (let f of driveFiles) {
+		// console.log(driveFiles)
+		for (let index = 0; index < Math.min(driveFiles.length, 10); index++) {
+			f = driveFiles[index]
 			filesLinksPromises.push(drive.files.get({
 				Authorization: oauth2Client.access_token,
 				fileId: f.id,
@@ -22,6 +24,7 @@ exports.getDriveFiles = async function () {
 			}))
 		}
 		filesLinks = await Promise.all(filesLinksPromises)
+		console.log(filesLinks)
 		return filesLinks
 	} catch (error) {
 		console.log(error)
