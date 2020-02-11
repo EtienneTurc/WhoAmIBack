@@ -24,18 +24,14 @@ const gmail = require("../google/services/gmail")
 // })
 
 // Without
-router.get("/simple", async (req, res) => {
-	promises = []
-	promises.push(gmail.getMails())
-	promises.push(calendar.getCalendarEvents())
+// router.get("/simple", async (req, res) => {
+// 	promises = []
+// 	promises.push(people.getPeopleInformation())
+// 	promises.push(calendar.getCalendarEvents())
+// 	promises.push(gmail.getMails())
 
-	let result = await Promise.all(promises)
-	let mails_received = result[0][1]
-	let mails_sent = result[0][1]
-	let events = result[1]
+// 	let result = await Promise.all(promises)
 
-	// let locations = calendar.getEventLocations(ev)
-
-	res.send({ mails: { received: { length: mails_received.length }, sent: { length: mails_sent.length } }, events: { length: events.length } })
-})
+// 	res.send({ people: result[0], calendar: result[1], gmail: result[2] })
+// })
 module.exports = router
