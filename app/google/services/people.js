@@ -15,6 +15,8 @@ const information = ["addresses",
 let filterPeople = people => {
 	let filtered = {}
 	// First and last Name
+	filtered.firstName = ""
+	filtered.lastName = ""
 	if (people.names && people.names.length) {
 		let n = people.names[0]
 		filtered.lastName = n.familyName
@@ -24,7 +26,7 @@ let filterPeople = people => {
 	// Birthday
 	if (people.birthdays) {
 		for (let b of people.birthdays) {
-			if (b.type == "ACCOUNT" && b.date) {
+			if (b.metadata.source.type == "ACCOUNT" && b.date) {
 				filtered.birthDate = b.date
 			}
 		}
