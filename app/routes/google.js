@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const utils = require("../utils/utils")
 
 const calendar = require("../google/services/calendar")
 const drive = require("../google/services/drive")
@@ -7,13 +8,11 @@ const gmail = require("../google/services/gmail")
 
 router.get("/people", async (req, res) => {
 	let peopleInfo = await people.getPeopleInformation()
-	// console.log("peopleInfo", peopleInfo)
 	res.send(peopleInfo)
 })
 
 router.get("/calendar", async (req, res) => {
 	let events = await calendar.getCalendarEvents()
-	// console.log("events", events)
 	res.send(events)
 })
 
@@ -22,19 +21,27 @@ router.get("/drive", async (req, res) => {
 	res.send(filesLinks)
 })
 
+var global_simple_mails_info = {}
 router.get("/gmail", async (req, res) => {
-	let messages = await gmail.getMails()
+	let messages = await gmail.getMails(req.session.token, global_simple_mails_info)
 	res.send(messages)
+})
+
+router.get("/gmail_simple", async (req, res) => {
+	await utils.waitDefined(global_simple_mails_info, req.session.token.access_token)
+	res.send(global_simple_mails_info[req.session.token.access_token])
+	delete global_simple_mails_info[req.session.token.access_token]
 })
 
 router.get("/", async (req, res) => {
 	let promises = []
 	promises.push(people.getPeopleInformation())
 	promises.push(calendar.getCalendarEvents())
-	promises.push(gmail.getMails())
+	promises.push(gmail.getMails(req.session.token, global_simple_mails_info))
+	console.log("GETTING THE DATA")
 
 	let result = await Promise.all(promises)
-
+	console.log("DONE")
 	res.send({ people: result[0], calendar: result[1], gmail: result[2] })
 })
 

@@ -1,7 +1,7 @@
-const moment = require('moment')
-
 const { google } = require('googleapis');
 const { oauth2Client } = require('../google')
+const Batchelor = require('batchelor');
+const utils = require('../../utils/utils')
 
 const gmail = google.gmail({
 	version: 'v1',
@@ -18,20 +18,20 @@ let decodeBase64 = (content) => {
 let cleanBody = str => {
 	// 	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split("\n").join(" ").split(/[.,?\/#!$%\^&\*;:{}=\-_`~()]/g).join("").normalize("NFD").split(/[\u0300-\u036f]/g).join("").split(/ +/g).join(" ")
 	// }
-	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split("\n").join(" ").split(/ +/g).join(" ")
+	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split(/ +/g).join(" ")
 }
 
 let filterMails = mails => {
 	let filtered = []
 	let headers = ['From', 'To', 'Subject']
 	mails.forEach(e => {
-		let part = e.data.payload.parts ? e.data.payload.parts.filter(p => p.mimeType == 'text/plain').map(p => cleanBody(decodeBase64(p.body.data || ""))).join(" ") : ""
+		let part = e.body.payload && e.body.payload.parts ? e.body.payload.parts.filter(p => p.mimeType == 'text/plain').map(p => cleanBody(decodeBase64(p.body.data || ""))).join(" ") : ""
 		filtered.push({
-			"snippet": e.data.snippet,
+			"snippet": e.body.snippet,
 			"status": e.status,
-			"date": e.data.internalDate,
-			"headers": e.data.payload.headers.filter(h => headers.includes(h.name)),
-			"body": cleanBody(htmlToText.fromString(decodeBase64(e.data.payload.body.data || ""), {
+			"date": e.body.internalDate,
+			"headers": e.body.payload.headers.filter(h => headers.includes(h.name)),
+			"body": cleanBody(htmlToText.fromString(decodeBase64(e.body.payload.body.data || ""), {
 				wordwrap: null,
 				ignoreHref: true,
 				ignoreImage: true,
@@ -65,43 +65,64 @@ let getDistribution = mails => {
 	return { startDate: startDate, distribution: distribution }
 }
 
-let allMails = async (labelIds, steps) => {
+let createBatch = (token) => {
+	return new Batchelor({
+		'uri': 'https://www.googleapis.com/batch/gmail/v1',
+		'method': 'POST',
+		'auth': {
+			'bearer': token.access_token
+		},
+		'headers': {
+			'Content-Type': 'multipart/mixed'
+		}
+	});
+}
+
+let getMailContent = (batch, mails) => {
+	return new Promise(function (resolve, reject) {
+		for (let m of mails) {
+			batch.add(
+				{
+					'method': 'GET',
+					'path': '/gmail/v1/users/me/messages/' + m.id + "?format=full"
+				}
+			);
+		}
+		batch.run((err, res) => {
+			if (err) reject(err)
+			resolve(res.parts)
+		})
+	});
+}
+
+let allMails = async (labelIds, token, steps) => {
 	var res = await gmail.users.messages.list({
 		'userId': "me",
 		labelIds: labelIds,
 	});
 	let messages = res.data.resultSizeEstimate ? res.data.messages : []
-	let mails = await Promise.all(getMailContent(messages))
+	let batch = createBatch(token)
+	let mails = await getMailContent(batch, messages)
 	i = 0
 	while (res.data.nextPageToken && (i < steps || steps == -1)) {
 		i++
+		batch = createBatch(token)
 		res = await gmail.users.messages.list({
 			'userId': "me",
 			labelIds: labelIds,
 			pageToken: res.data.nextPageToken
 		});
 		if (res.data.resultSizeEstimate) {
-			mails = mails.concat(await Promise.all(getMailContent(res.data.messages)))
+			let m = await getMailContent(batch, res.data.messages)
+			mails = mails.concat(m)
 		}
 	}
 	return mails
 }
 
-let getMailContent = mails => {
-	let promises = []
-	for (let m of mails) {
-		promises.push(gmail.users.messages.get({
-			'userId': "me",
-			'id': m.id,
-			'format': "full",
-		}))
-	}
-	return promises
-}
-
-exports.getMails = async function () {
-	var mailsReceived = await allMails(["INBOX"], 1)
-	var mailsSent = await allMails(["SENT"], 1)
+exports.getMails = async function (token, global_simple_mails_info) {
+	var mailsReceived = await allMails(["INBOX"], token, 1)
+	var mailsSent = await allMails(["SENT"], token, 1)
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)]
 
@@ -110,6 +131,7 @@ exports.getMails = async function () {
 	let received = { number: mails[0].length, ...distributions[0] }
 	let sent = { number: mails[1].length, ...distributions[1] }
 
-	// saveJson("gmail.txt", mails[0].concat(mails[1]))
+	global_simple_mails_info[token.access_token] = { received: received, sent: sent }
+	// utils.saveJson("gmail.txt", mails[0].concat(mails[1]))
 	return { received: received, sent: sent }
 }

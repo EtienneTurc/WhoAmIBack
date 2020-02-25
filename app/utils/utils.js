@@ -12,3 +12,14 @@ exports.saveJson = async (fileName, json) => {
 		console.log("The file was saved!");
 	});
 }
+
+exports.waitDefined = async (json, key) => {
+	return new Promise(function (resolve, reject) {
+		var observerInterval = setInterval(function () {
+			if (json[key]) {
+				clearInterval(observerInterval);
+				resolve()
+			}
+		}, 1000);
+	});
+}
