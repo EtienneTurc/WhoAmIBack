@@ -1,6 +1,8 @@
 const { google } = require('googleapis');
+const config = require("../../../config/config")
 const { oauth2Client } = require('../google')
 const Batchelor = require('batchelor');
+const axios = require('axios')
 const utils = require('../../utils/utils')
 
 const gmail = google.gmail({
@@ -96,33 +98,36 @@ let getMailContent = (batch, mails) => {
 }
 
 let allMails = async (labelIds, token, steps) => {
-	var res = await gmail.users.messages.list({
-		'userId': "me",
-		labelIds: labelIds,
-	});
-	let messages = res.data.resultSizeEstimate ? res.data.messages : []
-	let batch = createBatch(token)
-	let mails = await getMailContent(batch, messages)
-	i = 0
-	while (res.data.nextPageToken && (i < steps || steps == -1)) {
-		i++
-		batch = createBatch(token)
-		res = await gmail.users.messages.list({
+	let mails_promises = []
+	let res
+	let i = 0
+	while (i == 0 || res.data.nextPageToken && (i < steps || steps == -1)) {
+		let queries = {
 			'userId': "me",
 			labelIds: labelIds,
-			pageToken: res.data.nextPageToken
-		});
-		if (res.data.resultSizeEstimate) {
-			let m = await getMailContent(batch, res.data.messages)
-			mails = mails.concat(m)
 		}
+
+		if (i != 0) {
+			queries.pageToken = res.data.nextPageToken
+		}
+
+		res = await gmail.users.messages.list(queries);
+		if (res.data.resultSizeEstimate) {
+			let batch = createBatch(token)
+			mails_promises.push(getMailContent(batch, res.data.messages))
+		}
+
+		i++
 	}
+
+	let mails = await Promise.all(mails_promises)
+	mails = [].concat.apply([], mails);
 	return mails
 }
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, 1)
-	var mailsSent = await allMails(["SENT"], token, 1)
+	var mailsReceived = await allMails(["INBOX"], token, -1)
+	var mailsSent = await allMails(["SENT"], token, -1)
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)]
 
@@ -134,4 +139,8 @@ exports.getMails = async function (token, global_simple_mails_info) {
 	global_simple_mails_info[token.access_token] = { received: received, sent: sent }
 	// utils.saveJson("gmail.txt", mails[0].concat(mails[1]))
 	return { received: received, sent: sent }
+
+	let res = await axios.post(config.flaskUrl + "/analytics", { received: mails[0], sent: mails[1] })
+
+	return res.data
 }
