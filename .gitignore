@@ -3,3 +3,4 @@ config/config.json
 *.txt
 maillabels.json
 calendar.json
+data

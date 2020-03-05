@@ -17,13 +17,17 @@ router.get("/calendar", async (req, res) => {
 })
 
 router.get("/drive", async (req, res) => {
-	let filesLinks = await drive.getDriveFiles()
+	console.log("GETTING THE DATA FROM DRIVE")
+	let filesLinks = await drive.getDriveFiles(req.session.token)
+	console.log("DONE")
 	res.send(filesLinks)
 })
 
 var global_simple_mails_info = {}
 router.get("/gmail", async (req, res) => {
+	console.log("GETTING THE DATA FROM GMAIL")
 	let messages = await gmail.getMails(req.session.token, global_simple_mails_info)
+	console.log("DONE")
 	res.send(messages)
 })
 
