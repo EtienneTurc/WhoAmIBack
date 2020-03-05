@@ -5,45 +5,62 @@ const axios = require('axios')
 const utils = require('../../utils/utils')
 
 const gmail = google.gmail({
-	version: 'v1',
+	version: "v1",
 	auth: oauth2Client
 });
 
-const htmlToText = require('html-to-text');
+const htmlToText = require("html-to-text");
 
-let decodeBase64 = (content) => {
-	let buf = Buffer.from(content, 'base64'); // Ta-da
-	return buf.toString()
-}
+let decodeBase64 = content => {
+	let buf = Buffer.from(content, "base64"); // Ta-da
+	return buf.toString();
+};
 
 let cleanBody = str => {
 	// 	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split("\n").join(" ").split(/[.,?\/#!$%\^&\*;:{}=\-_`~()]/g).join("").normalize("NFD").split(/[\u0300-\u036f]/g).join("").split(/ +/g).join(" ")
 	// }
-	return str.split(/https?[^\s]+/g).join("").split("\r").join(" ").split(/ +/g).join(" ")
-}
+	return str
+		.split(/https?[^\s]+/g)
+		.join("")
+		.split("\r")
+		.join(" ")
+		.split(/ +/g)
+		.join(" ");
+};
 
 let filterMails = mails => {
-	let filtered = []
-	let headers = ['From', 'To', 'Subject']
+	let filtered = [];
+	let headers = ["From", "To", "Subject"];
 	mails.forEach(e => {
-		let part = e.body.payload && e.body.payload.parts ? e.body.payload.parts.filter(p => p.mimeType == 'text/plain').map(p => cleanBody(decodeBase64(p.body.data || ""))).join(" ") : ""
+		let part =
+			e.body.payload && e.body.payload.parts
+				? e.body.payload.parts
+					.filter(p => p.mimeType == "text/plain")
+					.map(p => cleanBody(decodeBase64(p.body.data || "")))
+					.join(" ")
+				: "";
 		filtered.push({
-			"snippet": e.body.snippet,
-			"status": e.status,
-			"date": e.body.internalDate,
-			"headers": e.body.payload.headers.filter(h => headers.includes(h.name)),
-			"body": cleanBody(htmlToText.fromString(decodeBase64(e.body.payload.body.data || ""), {
-				wordwrap: null,
-				ignoreHref: true,
-				ignoreImage: true,
-				longWordSplit: {
-					forceWrapOnLimit: false
-				}
-			})) + " " + part,
-		})
-	})
-	return filtered
-}
+			snippet: e.body.snippet,
+			status: e.status,
+			date: e.body.internalDate,
+			headers: e.body.payload.headers.filter(h => headers.includes(h.name)),
+			body:
+				cleanBody(
+					htmlToText.fromString(decodeBase64(e.body.payload.body.data || ""), {
+						wordwrap: null,
+						ignoreHref: true,
+						ignoreImage: true,
+						longWordSplit: {
+							forceWrapOnLimit: false
+						}
+					})
+				) +
+				" " +
+				part
+		});
+	});
+	return filtered;
+};
 
 let getDistribution = mails => {
 	let millisecondsInDay = 1000 * 3600 * 24
@@ -69,19 +86,17 @@ let getDistribution = mails => {
 let getMailContent = (batch, mails) => {
 	return new Promise(function (resolve, reject) {
 		for (let m of mails) {
-			batch.add(
-				{
-					'method': 'GET',
-					'path': '/gmail/v1/users/me/messages/' + m.id + "?format=full"
-				}
-			);
+			batch.add({
+				method: "GET",
+				path: "/gmail/v1/users/me/messages/" + m.id + "?format=full"
+			});
 		}
 		batch.run((err, res) => {
-			if (err) reject(err)
-			resolve(res.parts)
-		})
+			if (err) reject(err);
+			resolve(res.parts);
+		});
 	});
-}
+};
 
 let allMails = async (labelIds, token, steps) => {
 	let mails_promises = []
