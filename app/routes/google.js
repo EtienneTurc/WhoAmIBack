@@ -27,12 +27,13 @@ var global_simple_mails_info = {}
 router.get("/analytics/gmail", async (req, res) => {
 	console.log("GETTING THE DATA FROM GMAIL")
 	let messages = await gmail.getMails(req.session.token, global_simple_mails_info)
-	console.log("DONE")
 	res.send(messages)
 })
 
 router.get("/basic/gmail", async (req, res) => {
+	console.log("GETTING THE DATA FROM GMAIL BASIC")
 	await utils.waitDefined(global_simple_mails_info, req.session.token.access_token)
+	console.log("DONE")
 	res.send(global_simple_mails_info[req.session.token.access_token])
 	delete global_simple_mails_info[req.session.token.access_token]
 })

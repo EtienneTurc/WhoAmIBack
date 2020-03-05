@@ -62,27 +62,6 @@ let filterMails = mails => {
 	return filtered;
 };
 
-let getDistribution = mails => {
-	let millisecondsInDay = 1000 * 3600 * 24
-	let dates = mails.map(m => Math.floor(m.date / millisecondsInDay) * millisecondsInDay)
-	dates.sort()
-
-	let distribution = [1]
-	let startDate = dates[0]
-	let lastDate = dates[0]
-
-	for (let d of dates) {
-		if (d == lastDate) {
-			distribution[distribution.length - 1] += 1
-		} else {
-			distribution = distribution.concat(new Array((d - lastDate) / millisecondsInDay).fill(0))
-			distribution[distribution.length - 1] += 1
-			lastDate = d
-		}
-	}
-	return { startDate: startDate, distribution: distribution }
-}
-
 let getMailContent = (batch, mails) => {
 	return new Promise(function (resolve, reject) {
 		for (let m of mails) {
@@ -127,15 +106,13 @@ let allMails = async (labelIds, token, steps) => {
 }
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, 15)
-	var mailsSent = await allMails(["SENT"], token, 15)
+	var mailsReceived = await allMails(["INBOX"], token, 1)
+	var mailsSent = await allMails(["SENT"], token, 1)
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)]
 
-	let distributions = [getDistribution(mails[0]), getDistribution(mails[1])]
-
-	let received = { number: mails[0].length, ...distributions[0] }
-	let sent = { number: mails[1].length, ...distributions[1] }
+	let received = { number: mails[0].length, dates: mails[0].map(m => m.date) }
+	let sent = { number: mails[1].length, dates: mails[1].map(m => m.date) }
 
 	global_simple_mails_info[token.access_token] = { received: received, sent: sent }
 	// utils.saveJson("gmail.txt", mails[0].concat(mails[1]))
