@@ -1,7 +1,6 @@
 const { google } = require('googleapis');
 const config = require("../../../config/config")
 const { oauth2Client } = require('../google')
-const Batchelor = require('batchelor');
 const axios = require('axios')
 const utils = require('../../utils/utils')
 
@@ -67,19 +66,6 @@ let getDistribution = mails => {
 	return { startDate: startDate, distribution: distribution }
 }
 
-let createBatch = (token) => {
-	return new Batchelor({
-		'uri': 'https://www.googleapis.com/batch/gmail/v1',
-		'method': 'POST',
-		'auth': {
-			'bearer': token.access_token
-		},
-		'headers': {
-			'Content-Type': 'multipart/mixed'
-		}
-	});
-}
-
 let getMailContent = (batch, mails) => {
 	return new Promise(function (resolve, reject) {
 		for (let m of mails) {
@@ -113,7 +99,7 @@ let allMails = async (labelIds, token, steps) => {
 
 		res = await gmail.users.messages.list(queries);
 		if (res.data.resultSizeEstimate) {
-			let batch = createBatch(token)
+			let batch = utils.createBatch('https://www.googleapis.com/batch/gmail/v1', "POST", token)
 			mails_promises.push(getMailContent(batch, res.data.messages))
 		}
 
@@ -126,8 +112,8 @@ let allMails = async (labelIds, token, steps) => {
 }
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, -1)
-	var mailsSent = await allMails(["SENT"], token, -1)
+	var mailsReceived = await allMails(["INBOX"], token, 15)
+	var mailsSent = await allMails(["SENT"], token, 15)
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)]
 
@@ -138,9 +124,9 @@ exports.getMails = async function (token, global_simple_mails_info) {
 
 	global_simple_mails_info[token.access_token] = { received: received, sent: sent }
 	// utils.saveJson("gmail.txt", mails[0].concat(mails[1]))
-	return { received: received, sent: sent }
 
-	let res = await axios.post(config.flaskUrl + "/analytics", { received: mails[0], sent: mails[1] })
+	let res = await axios.post(config.flaskUrl + "/analytics/mail", { received: mails[0], sent: mails[1] })
 
+	console.log(res.data)
 	return res.data
 }

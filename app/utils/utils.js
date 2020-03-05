@@ -1,4 +1,6 @@
 const fs = require('fs');
+const Batchelor = require('batchelor');
+
 
 exports.check = (el, status, message) => {
 	if (!el) throw { status, message }
@@ -21,5 +23,18 @@ exports.waitDefined = async (json, key) => {
 				resolve()
 			}
 		}, 1000);
+	});
+}
+
+exports.createBatch = (uri, method, token) => {
+	return new Batchelor({
+		'uri': uri, //'https://www.googleapis.com/batch/gmail/v1',
+		'method': method,
+		'auth': {
+			'bearer': token.access_token
+		},
+		'headers': {
+			'Content-Type': 'multipart/mixed'
+		}
 	});
 }
