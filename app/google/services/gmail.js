@@ -28,6 +28,12 @@ let cleanBody = str => {
 		.join(" ");
 };
 
+let getDistribution = mails => {
+	return mails.map(function (m) {
+		return { "date": m.date, "amount": 1 }
+	})
+}
+
 let filterMails = mails => {
 	let filtered = [];
 	let headers = ["From", "To", "Subject"];
@@ -111,8 +117,8 @@ exports.getMails = async function (token, global_simple_mails_info) {
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)]
 
-	let received = { number: mails[0].length, dates: mails[0].map(m => m.date) }
-	let sent = { number: mails[1].length, dates: mails[1].map(m => m.date) }
+	let received = { number: mails[0].length, distribution: getDistribution(mails[0]) }
+	let sent = { number: mails[1].length, distribution: getDistribution(mails[1]) }
 
 	global_simple_mails_info[token.access_token] = { received: received, sent: sent }
 	// utils.saveJson("gmail.txt", mails[0].concat(mails[1]))
