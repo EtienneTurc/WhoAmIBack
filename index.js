@@ -29,6 +29,7 @@ app.use(session({
 
 app.use("/login", require("./app/routes/login"))
 app.use("/google", setToken, require("./app/routes/google"))
+app.use("/facebook", require("./app/routes/facebook"))
 app.use("/analytics", setToken, require("./app/routes/analytics"))
 
 app.use((err, req, res, next) => {
