@@ -2,9 +2,9 @@ const { google } = require('googleapis');
 const config = require('../../config/config')
 
 const oauth2Client = new google.auth.OAuth2(
-	config.clientID,
-	config.clientSecret,
-	config.redirectUrl
+	config.google.clientID,
+	config.google.clientSecret,
+	config.google.redirectUrl
 );
 
 // generate a url that asks permissions the given scopes
@@ -23,10 +23,10 @@ function getConsentUrl() {
 async function setToken(req, res, next) {
 	try {
 
-		if (!req.session.token) {
+		if (!req.session.google) {
 			res.sendStatus(401) // Unauthorized
 		} else {
-			oauth2Client.setCredentials(req.session.token);
+			oauth2Client.setCredentials(req.session.google);
 		}
 		next()
 	} catch (err) {

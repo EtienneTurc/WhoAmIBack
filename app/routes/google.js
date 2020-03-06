@@ -18,7 +18,7 @@ router.get("/calendar", async (req, res) => {
 
 router.get("/drive", async (req, res) => {
   console.log("GETTING THE DATA FROM DRIVE");
-  let filesLinks = await drive.getDriveFiles(req.session.token);
+  let filesLinks = await drive.getDriveFiles(req.session.google);
   console.log("DONE");
   res.send(filesLinks);
 });
@@ -27,7 +27,7 @@ var global_simple_mails_info = {};
 router.get("/analytics/gmail", async (req, res) => {
   console.log("GETTING THE DATA FROM GMAIL");
   let messages = await gmail.getMails(
-    req.session.token,
+    req.session.google,
     global_simple_mails_info
   );
   res.send(messages);
@@ -37,18 +37,17 @@ router.get("/basic/gmail", async (req, res) => {
   console.log("GETTING THE DATA FROM GMAIL BASIC");
   await utils.waitDefined(
     global_simple_mails_info,
-    req.session.token.access_token
+    req.session.google.access_token
   );
-  console.log("DONE");
-  res.send(global_simple_mails_info[req.session.token.access_token]);
-  delete global_simple_mails_info[req.session.token.access_token];
+  res.send(global_simple_mails_info[req.session.google.access_token]);
+  delete global_simple_mails_info[req.session.google.access_token];
 });
 
 router.get("/", async (req, res) => {
   let promises = [];
   promises.push(people.getPeopleInformation());
   promises.push(calendar.getCalendarEvents());
-  promises.push(gmail.getMails(req.session.token, global_simple_mails_info));
+  promises.push(gmail.getMails(req.session.google, global_simple_mails_info));
   console.log("GETTING THE DATA");
 
   let result = await Promise.all(promises);
