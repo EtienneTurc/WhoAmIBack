@@ -147,7 +147,5 @@ exports.getMails = async function(token, global_simple_mails_info) {
     received: mails[0],
     sent: mails[1]
   });
-
-  console.log(res.data);
   return res.data;
 };
