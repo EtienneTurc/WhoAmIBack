@@ -6,7 +6,7 @@ const drive = require("../google/services/drive");
 const people = require("../google/services/people");
 const gmail = require("../google/services/gmail");
 
-router.get("/people", async (req, res) => {
+router.get("/basic/people", async (req, res) => {
 	let peopleInfo = await people.getPeopleInformation();
 	res.send(peopleInfo);
 });
