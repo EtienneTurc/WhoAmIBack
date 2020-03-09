@@ -5,13 +5,6 @@ const config = require("../../config/config.json")
 const google = require("../google/google")
 const axios = require('axios')
 
-
-
-router.get("/google", (req, res) => {
-	let consentUrl = google.getConsentUrl()
-	res.send(consentUrl)
-})
-
 router.get("/googleToken", async (req, res) => {
 	try {
 		let { tokens } = await google.oauth2Client.getToken(req.query.code)
