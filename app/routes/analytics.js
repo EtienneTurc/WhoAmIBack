@@ -28,7 +28,7 @@ const gmail = require("../google/services/gmail")
 // 	promises = []
 // 	promises.push(people.getPeopleInformation())
 // 	promises.push(calendar.getCalendarEvents())
-// 	promises.push(gmail.getMails())
+// 	promises.push(gmail.getMails(req.session.google.token))
 
 // 	let result = await Promise.all(promises)
 
