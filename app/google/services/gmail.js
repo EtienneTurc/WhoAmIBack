@@ -37,6 +37,7 @@ let getDistribution = mails => {
 let filterMails = mails => {
   let filtered = [];
   let headers = ["From", "To", "Subject"];
+
   mails.forEach(e => {
     let part =
       e.body.payload && e.body.payload.parts
@@ -45,25 +46,31 @@ let filterMails = mails => {
             .map(p => cleanBody(decodeBase64(p.body.data || "")))
             .join(" ")
         : "";
-    filtered.push({
-      snippet: e.body.snippet,
-      status: e.status,
-      date: e.body.internalDate,
-      headers: e.body.payload.headers.filter(h => headers.includes(h.name)),
-      body:
-        cleanBody(
-          htmlToText.fromString(decodeBase64(e.body.payload.body.data || ""), {
-            wordwrap: null,
-            ignoreHref: true,
-            ignoreImage: true,
-            longWordSplit: {
-              forceWrapOnLimit: false
-            }
-          })
-        ) +
-        " " +
-        part
-    });
+    if (!e.body.payload) {
+    } else {
+      filtered.push({
+        snippet: e.body.snippet,
+        status: e.status,
+        date: e.body.internalDate,
+        headers: e.body.payload.headers.filter(h => headers.includes(h.name)),
+        body:
+          cleanBody(
+            htmlToText.fromString(
+              decodeBase64(e.body.payload.body.data || ""),
+              {
+                wordwrap: null,
+                ignoreHref: true,
+                ignoreImage: true,
+                longWordSplit: {
+                  forceWrapOnLimit: false
+                }
+              }
+            )
+          ) +
+          " " +
+          part
+      });
+    }
   });
   return filtered;
 };
