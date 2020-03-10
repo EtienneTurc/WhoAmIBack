@@ -1,7 +1,6 @@
 const axios = require('axios')
 
 exports.basicInfo = async function (token) {
-	console.log("HELLO")
 	try {
 		let me = await axios.get("https://graph.facebook.com/v6.0/me/", {
 			params: {
@@ -10,7 +9,28 @@ exports.basicInfo = async function (token) {
 			}
 		})
 		console.log(me.data)
-		return me
+		return me.data
+	}
+	catch (err) {
+		console.log(err)
+	}
+}
+
+exports.basicFeed = async function (token) {
+	try {
+		let me = await axios.get("https://graph.facebook.com/v6.0/me/feed", {
+			params: {
+				fields: 'caption,description,message,full_picture,place,targeting,type',
+				access_token: token
+			}
+		})
+		// console.log(me.data)
+		for (let el of me.data.data) {
+			if (el.targeting) {
+				console.log("targeting", el.targeting)
+			}
+		}
+		return me.data
 	}
 	catch (err) {
 		console.log(err)
