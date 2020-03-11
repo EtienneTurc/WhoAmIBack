@@ -9,6 +9,15 @@ router.get("/loggedTo", async (req, res) => {
 	res.send(config.services.filter(s => s in req.session))
 })
 
+router.get("/logout", async (req, res) => {
+	for (let q of req.query) {
+		if (config.services.includes(q) && config.services[q]) {
+			delete confiig.services[q]
+		}
+	}
+	res.send(config.services.filter(s => s in req.session))
+})
+
 router.get("/googleToken", async (req, res) => {
 	try {
 		let { tokens } = await google.oauth2Client.getToken(req.query.code)
