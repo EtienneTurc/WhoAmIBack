@@ -84,7 +84,7 @@ let getMailContent = (batch, mails) => {
 		}
 		batch.run((err, res) => {
 			if (err) reject(err);
-			resolve(res.parts);
+			resolve(res ? res.parts : []);
 		});
 	});
 };
@@ -122,8 +122,8 @@ let allMails = async (labelIds, token, steps) => {
 };
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, -1); // last variable = number of mails to get * 100
-	var mailsSent = await allMails(["SENT"], token, -1);
+	var mailsReceived = await allMails(["INBOX"], token, 10); // last variable = number of mails to get * 100
+	var mailsSent = await allMails(["SENT"], token, 1);
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
 
@@ -136,7 +136,7 @@ exports.getMails = async function (token, global_simple_mails_info) {
 		distribution: getDistribution(mails[1])
 	};
 
-	global_simple_mails_info[token.access_token] = {
+	global_simple_mails_info[token] = {
 		received: received,
 		sent: sent
 	};

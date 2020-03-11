@@ -5,7 +5,8 @@ const config = require('./config/config')
 const cors = require('cors')
 const MongoStore = require('connect-mongo')(session);
 
-const { setToken } = require('./app/google/google')
+const { checkGoogleLogin } = require('./app/google/google')
+const { checkFacebookLogin } = require('./app/facebook/facebook')
 
 
 app.use(express.json())
@@ -28,9 +29,9 @@ app.use(session({
 }))
 
 app.use("/login", require("./app/routes/login"))
-app.use("/google", setToken, require("./app/routes/google"))
-app.use("/facebook", require("./app/routes/facebook"))
-app.use("/analytics", setToken, require("./app/routes/analytics"))
+app.use("/google", checkGoogleLogin, require("./app/routes/google"))
+app.use("/analytics", checkGoogleLogin, require("./app/routes/analytics"))
+app.use("/facebook", checkFacebookLogin, require("./app/routes/facebook"))
 
 app.use((err, req, res, next) => {
 	if (res.headersSent)

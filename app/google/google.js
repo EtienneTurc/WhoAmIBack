@@ -8,19 +8,18 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 // Set the token
-async function setToken(req, res, next) {
+let checkGoogleLogin = (req, res, next) => {
 	try {
-
 		if (!req.session.google) {
 			res.sendStatus(401) // Unauthorized
 		} else {
 			oauth2Client.setCredentials(req.session.google);
+			next()
 		}
-		next()
 	} catch (err) {
 		console.log(err)
 		res.send(err)
 	}
 }
 
-module.exports = { oauth2Client, setToken }
+module.exports = { oauth2Client, checkGoogleLogin }

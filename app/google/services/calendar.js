@@ -46,16 +46,16 @@ let getLocations = events => {
 
 
 
-exports.getCalendarEvents = async function () {
+exports.getCalendarEvents = async function (token) {
 	const res = await calendar.calendarList.list({
-		Authorization: oauth2Client.access_token
+		Authorization: token
 	});
 
 	let calendarList = res.data.items
 	let eventsPromises = []
 	for (let cal of calendarList) {
 		eventsPromises.push(calendar.events.list({
-			Authorization: oauth2Client.access_token,
+			Authorization: token,
 			calendarId: cal.id
 		}))
 	}

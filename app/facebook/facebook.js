@@ -36,3 +36,16 @@ exports.basicFeed = async function (token) {
 		console.log(err)
 	}
 }
+
+exports.checkFacebookLogin = (req, res, next) => {
+	try {
+		if (!req.session.facebook) {
+			res.sendStatus(401) // Unauthorized
+		} else {
+			next()
+		}
+	} catch (err) {
+		console.log(err)
+		res.send(err)
+	}
+}

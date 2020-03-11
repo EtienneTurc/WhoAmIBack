@@ -31,7 +31,7 @@ exports.createBatch = (uri, method, token) => {
 		'uri': uri, //'https://www.googleapis.com/batch/gmail/v1',
 		'method': method,
 		'auth': {
-			'bearer': token.access_token
+			'bearer': token
 		},
 		'headers': {
 			'Content-Type': 'multipart/mixed'
