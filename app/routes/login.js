@@ -9,10 +9,10 @@ router.get("/loggedTo", async (req, res) => {
 	res.send(config.services.filter(s => s in req.session))
 })
 
-router.get("/logout", async (req, res) => {
+router.post("/logout", async (req, res) => {
 	for (let q of req.query) {
-		if (config.services.includes(q) && config.services[q]) {
-			delete confiig.services[q]
+		if (config.services.includes(q) && req.session[q]) {
+			delete req.session[q]
 		}
 	}
 	res.send(config.services.filter(s => s in req.session))
