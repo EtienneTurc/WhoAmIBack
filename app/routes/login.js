@@ -37,7 +37,6 @@ router.get("/googleToken", async (req, res) => {
       res.sendStatus(401);
     }
   } catch (err) {
-    console.log(err);
     res.sendStatus(401);
   }
 });
@@ -65,7 +64,6 @@ router.get("/facebookToken", async (req, res) => {
       res.sendStatus(401);
     }
   } catch (err) {
-    console.log(err);
     res.sendStatus(401);
   }
 });
