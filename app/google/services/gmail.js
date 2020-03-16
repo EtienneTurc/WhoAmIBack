@@ -35,18 +35,15 @@ let getDistribution = mails => {
 };
 
 let parseHtml = function (text) {
-	return htmlToText.fromString(
-		text,
-		{
-			wordwrap: null,
-			ignoreHref: true,
-			ignoreImage: true,
-			longWordSplit: {
-				forceWrapOnLimit: false
-			}
+	return htmlToText.fromString(text, {
+		wordwrap: null,
+		ignoreHref: true,
+		ignoreImage: true,
+		longWordSplit: {
+			forceWrapOnLimit: false
 		}
-	)
-}
+	});
+};
 
 let getPartsData = function (parts) {
 	let data = ""
