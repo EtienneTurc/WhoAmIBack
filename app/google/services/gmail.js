@@ -48,18 +48,31 @@ let parseHtml = function (text) {
 	)
 }
 
+let getPartsData = function (parts) {
+	let data = ""
+	for (let p of parts) {
+		if (p.mimeType == "multipart/alternative" || p.mimeType == "multipart/related") {
+			data = data.concat(' ', getPartsData(p.parts))
+		} else if (p.mimeType == "text/plain") {
+			data = data.concat(' ', cleanBody(decodeBase64(p.body.data || "")))
+		} else if (p.mimeType == "text/html") {
+			data = data.concat(' ', cleanBody(parseHtml(decodeBase64(p.body.data || ""))))
+		}
+		// if (p.body && p.body.size == 112) {
+		// 	console.log(p)
+		// 	console.log(p)
+		// 	console.log("DATA", data)
+		// }
+	}
+	return data
+}
 let filterMails = mails => {
 	let filtered = [];
 	let headers = ["From", "To", "Subject"];
 
 	mails.forEach(e => {
 		let part =
-			e.body.payload && e.body.payload.parts
-				? e.body.payload.parts
-					.filter(p => p.mimeType == "text/plain" || p.mimeType == "text/html")
-					.map(p => cleanBody(p.mimeType == "text/html" ? parseHtml(decodeBase64(p.body.data || "")) : decodeBase64(p.body.data || "")))
-					.join(" ")
-				: "";
+			e.body.payload && e.body.payload.parts ? getPartsData(e.body.payload.parts) : "";
 		if (!e.body.payload) {
 		} else {
 			filtered.push({
@@ -122,8 +135,8 @@ let allMails = async (labelIds, token, steps) => {
 };
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, 10); // last variable = number of mails to get * 100
-	var mailsSent = await allMails(["SENT"], token, 1);
+	var mailsReceived = await allMails(["INBOX"], token, 0); // last variable = number of mails to get * 100
+	var mailsSent = await allMails(["SENT"], token, -1);
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
 
