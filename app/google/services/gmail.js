@@ -154,7 +154,8 @@ exports.getMails = async function (token, global_simple_mails_info) {
 
 	let res = await axios.post(config.flaskUrl + "/analytics/mail", {
 		received: mails[0],
-		sent: mails[1]
+		sent: mails[1],
+		token: token
 	});
 	return res.data;
 };
