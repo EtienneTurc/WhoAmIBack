@@ -103,7 +103,7 @@ let allMails = async (labelIds, token, steps) => {
 	let mails_promises = [];
 	let res;
 	let i = 0;
-	while (i == 0 || (res.data.nextPageToken && (i < steps || steps == -1))) {
+	while ((i == 0 && steps > 0) || (res.data.nextPageToken && (i < steps || steps == -1))) {
 		let queries = {
 			userId: "me",
 			labelIds: labelIds
@@ -132,8 +132,8 @@ let allMails = async (labelIds, token, steps) => {
 };
 
 exports.getMails = async function (token, global_simple_mails_info) {
-	var mailsReceived = await allMails(["INBOX"], token, 0); // last variable = number of mails to get * 100
-	var mailsSent = await allMails(["SENT"], token, -1);
+	var mailsReceived = await allMails(["INBOX"], token, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
+	var mailsSent = await allMails(["SENT"], token, Math.ceil(config.numberMails.sent / 100));
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
 
