@@ -1,5 +1,5 @@
 const axios = require("axios");
-const redis = require("../../redis/redis")
+const redis = require("../redis/redis")
 
 exports.basicInfo = async function (token) {
 	try {

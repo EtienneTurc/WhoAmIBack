@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const { oauth2Client } = require('../google')
 
-const redis = require('../redis/redis')
+const redis = require('../../redis/redis')
 
 const people = google.people({
 	version: 'v1',
