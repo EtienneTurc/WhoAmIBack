@@ -4,6 +4,7 @@ const { oauth2Client } = require("../google");
 const axios = require("axios");
 const utils = require("../../utils/utils");
 
+
 const gmail = google.gmail({
 	version: "v1",
 	auth: oauth2Client
@@ -100,10 +101,13 @@ let getMailContent = (batch, mails) => {
 };
 
 let allMails = async (labelIds, token, steps) => {
+	if (!steps) {
+		return []
+	}
 	let mails_promises = [];
 	let res;
 	let i = 0;
-	while ((i == 0 && steps > 0) || (res.data.nextPageToken && (i < steps || steps == -1))) {
+	while (i == 0 || (res.data.nextPageToken && (i < steps || steps == -1))) {
 		let queries = {
 			userId: "me",
 			labelIds: labelIds
@@ -116,7 +120,7 @@ let allMails = async (labelIds, token, steps) => {
 		res = await gmail.users.messages.list(queries);
 		if (res.data.resultSizeEstimate) {
 			let batch = utils.createBatch(
-				"https://www.googleapis.com/batch/gmail/v1",
+				"https://www.googleapis.com/batch",
 				"POST",
 				token
 			);
