@@ -9,7 +9,7 @@ const people = require("../google/services/people");
 const gmail = require("../google/services/gmail");
 
 router.get("/basic/people", async (req, res) => {
-	let peopleInfo = await people.getPeopleInformation();
+	let peopleInfo = await people.getPeopleInformation(req.session.google.access_token);
 	res.send(peopleInfo);
 });
 

@@ -1,6 +1,7 @@
 const { google } = require("googleapis");
-const config = require("../../../config/config");
 const { oauth2Client } = require("../google");
+const config = require("../../../config/config");
+const redis = require("../../redis/redis")
 const axios = require("axios");
 const utils = require("../../utils/utils");
 
@@ -136,10 +137,13 @@ let allMails = async (labelIds, token, steps) => {
 };
 
 exports.getMails = async function (token, global_simple_mails_info) {
+	redis.storeProcessing(token, "google", "mail")
+
 	var mailsReceived = await allMails(["INBOX"], token, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
 	var mailsSent = await allMails(["SENT"], token, Math.ceil(config.numberMails.sent / 100));
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
+	redis.storeData(token, "raw.google", "mail", { received: mails[0], sent: mails[1] })
 
 	let received = {
 		number: mails[0].length,

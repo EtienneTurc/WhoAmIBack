@@ -1,6 +1,8 @@
 const { google } = require('googleapis');
 const { oauth2Client } = require('../google')
 
+const redis = require('../redis/redis')
+
 const people = google.people({
 	version: 'v1',
 	auth: oauth2Client
@@ -47,11 +49,15 @@ let filterPeople = people => {
 	return filtered
 }
 
-exports.getPeopleInformation = async function () {
+exports.getPeopleInformation = async function (token) {
+	redis.storeProcessing(token, "google", "people")
 	const res = await people.people.get({
 		Authorization: oauth2Client.access_token,
 		personFields: information,
 		resourceName: "people/me"
 	})
-	return filterPeople(res.data)
+
+	let filter = filterPeople(res.data)
+	redis.storeData()
+	return filter
 }

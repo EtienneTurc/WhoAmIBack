@@ -1,0 +1,46 @@
+{
+	"raw": {
+		"facebook": {
+			"user": {
+				"meta": {}
+			}
+		},
+		"google": {
+			"people": {
+				"meta": {}
+			},
+			"mail": {
+				"meta": {}
+			},
+			"drive": {
+				"meta": {}
+			}
+		}
+	},
+	"toDisplay": {
+		"id": {
+			"meta": {}
+		},
+		"mails": {
+			"meta": {}
+		},
+		"words": {
+			"meta": {}
+		},
+		"lydia": {
+			"meta": {}
+		},
+		"doctolib": {
+			"meta": {}
+		},
+		"uberRides": {
+			"meta": {}
+		},
+		"uberEats": {
+			"meta": {}
+		},
+		"uberBike": {
+			"meta": {}
+		}
+	}
+}
