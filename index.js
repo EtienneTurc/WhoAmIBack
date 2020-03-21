@@ -7,7 +7,6 @@ const MongoStore = require("connect-mongo")(session);
 const bodyParser = require("body-parser");
 
 const { checkGoogleLogin } = require("./app/google/google");
-const { checkFacebookLogin } = require("./app/facebook/facebook");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,9 +31,6 @@ app.use(
 
 app.use("/login", require("./app/routes/login"));
 app.use("/component", checkGoogleLogin, require("./app/routes/proxy"))
-app.use("/google", checkGoogleLogin, require("./app/routes/google"));
-app.use("/analytics", checkGoogleLogin, require("./app/routes/analytics"));
-app.use("/facebook", checkFacebookLogin, require("./app/routes/facebook"));
 
 app.use((err, req, res, next) => {
 	if (res.headersSent) return next(err);

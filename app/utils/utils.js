@@ -40,7 +40,7 @@ exports.createBatch = (uri, method, token) => {
 	});
 }
 
-exports.startProcessing(token) {
+exports.startProcessing = (token) => {
 	redis.storeProcessing(token, "google", "people")
 	redis.storeProcessing(token, "google", "mail")
 	redis.storeProcessing(token, "facebook", "user")
