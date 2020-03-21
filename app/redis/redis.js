@@ -6,14 +6,13 @@ const services = require("../../config/services")
 const { setData, getData } = require("./utils")
 
 let createNewUser = function (token) {
-	setData(client, token, "", store)
-	getData(client, token, "")
+	return setData(client, token, "", store)
 }
 
 let storeData = function (token, path, key, value) {
 	path = path.replace(/^\./, '');
 	path = path.replace(/\.$/, '');
-	setData(client, token, `${path}.${key}`, value)
+	return setData(client, token, `${path}.${key}`, value)
 }
 
 let storeProcessing = function (token, service, subservice) {
@@ -22,7 +21,10 @@ let storeProcessing = function (token, service, subservice) {
 	}
 }
 
-// storeData()
-// createNewUser("doc")
+let retrieveData = function (token, path, key) {
+	path = path.replace(/^\./, '');
+	path = path.replace(/\.$/, '');
+	return getData(client, token, `${path}.${key}`)
+}
 
-module.exports = { createNewUser, storeData }
+module.exports = { createNewUser, storeData, retrieveData, storeProcessing }

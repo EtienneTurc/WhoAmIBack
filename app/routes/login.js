@@ -34,7 +34,8 @@ router.get("/googleToken", async (req, res) => {
 			req.session.google = tokens;
 			req.session.save();
 
-			redis.createNewSession(tokens.access_token)
+			await redis.createNewSession(tokens.access_token)
+			utils.startProcessing()
 
 			res.send(tokens);
 		} else {

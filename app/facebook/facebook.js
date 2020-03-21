@@ -1,21 +1,20 @@
 const axios = require("axios");
 const redis = require("../redis/redis")
+const { broker } = require("../utils/broker")
 
-exports.basicInfo = async function (token) {
-	try {
-		redis.storeProcessing(token, "facebook", "user")
-		let me = await axios.get("https://graph.facebook.com/v6.0/me/", {
-			params: {
-				fields: "first_name,picture.type(large),hometown,location",
-				access_token: token
-			}
-		});
-		redis.storeData(token, "raw.facebook", "user", me.data)
-		return me.data;
-	} catch (err) {
-		console.log(err);
-	}
+let getAndStoreUser = async function (token) {
+	let me = await axios.get("https://graph.facebook.com/v6.0/me/", {
+		params: {
+			fields: "first_name,picture.type(large),hometown,location",
+			access_token: token
+		}
+	});
+
+	await redis.storeData(token, "raw.facebook", "user", me.data)
+	broker.publish("raw/facebook/user", JSON.stringify({ token: token }))
 };
+
+broker.listenTo("start/facebook/user", getAndStoreUser)
 
 exports.basicFeed = async function (token) {
 	try {
