@@ -1,4 +1,8 @@
 {
+	"tokens": {
+		"google": "",
+		"facebook": ""
+	},
 	"raw": {
 		"facebook": {
 			"user": {

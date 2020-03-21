@@ -1,4 +1,5 @@
 {
+	"jwtSecret": "Pasboum",
 	"sessionSecret": "Youplaboum",
 	"storeSecret": "Badaboum",
 	"url": "http://locahost:8001",

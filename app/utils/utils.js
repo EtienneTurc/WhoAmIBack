@@ -16,17 +16,6 @@ exports.saveJson = async (fileName, json) => {
 	});
 }
 
-exports.waitDefined = async (json, key) => {
-	return new Promise(function (resolve, reject) {
-		var observerInterval = setInterval(function () {
-			if (json[key]) {
-				clearInterval(observerInterval);
-				resolve()
-			}
-		}, 1000);
-	});
-}
-
 exports.createBatch = (uri, method, token) => {
 	return new Batchelor({
 		'uri': uri, //'https://www.googleapis.com/batch/gmail/v1',

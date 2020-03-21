@@ -51,8 +51,9 @@ let filterPeople = people => {
 }
 
 let getAndStorePeople = async function (token) {
+	let googleToken = await redis.retrieveData(token, "tokens", "google")
 	const res = await people.people.get({
-		Authorization: oauth2Client.access_token,
+		Authorization: googleToken,
 		personFields: information,
 		resourceName: "people/me"
 	})

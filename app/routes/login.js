@@ -1,10 +1,11 @@
 const router = require("express").Router();
+const axios = require("axios");
 
 const config = require("../../config/config.json");
 const redis = require("../redis/redis")
-
 const google = require("../google/google");
-const axios = require("axios");
+const { getJwtToken } = require("../utils/login")
+
 
 router.get("/loggedTo", async (req, res) => {
 	console.log(
@@ -31,13 +32,18 @@ router.get("/googleToken", async (req, res) => {
 	try {
 		let { tokens } = await google.oauth2Client.getToken(req.query.code);
 		if (tokens) {
-			req.session.google = tokens;
-			req.session.save();
+			if (!req.session.token) {
+				// TODO
+				let token = getJwtToken("etienne.turc@gmail.com")
+				await redis.createNewSession(token)
+				req.session.token = token
+				req.session.save()
+			}
 
-			await redis.createNewSession(tokens.access_token)
+			await redis.storeData(token, "tokens", "google", tokens.access_token)
 			utils.startProcessing()
 
-			res.send(tokens);
+			res.sendStatus(200);
 		} else {
 			res.sendStatus(401);
 		}
@@ -60,11 +66,17 @@ router.get("/facebookToken", async (req, res) => {
 			}
 		);
 
-		req.session.facebook = response.data;
-		req.session.save();
-
 		if (response.data) {
-			res.send(response.data);
+			if (!req.session.token) {
+				// TODO
+				let token = getJwtToken("etienne.turc@gmail.com")
+				await redis.createNewSession(token)
+				req.session.token = token
+				req.session.save()
+			}
+
+			await redis.storeData(token, "tokens", "facebook", response.data.access_token)
+			res.sendStatus(200);
 		} else {
 			res.sendStatus(401);
 		}

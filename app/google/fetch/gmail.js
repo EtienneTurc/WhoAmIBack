@@ -124,8 +124,9 @@ let allMails = async (labelIds, token, steps) => {
 };
 
 let getAndStoreMails = async function (token) {
-	var mailsReceived = await allMails(["INBOX"], token, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
-	var mailsSent = await allMails(["SENT"], token, Math.ceil(config.numberMails.sent / 100));
+	let googleToken = await redis.retrieveData(token, "tokens", "google")
+	var mailsReceived = await allMails(["INBOX"], googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
+	var mailsSent = await allMails(["SENT"], googleToken, Math.ceil(config.numberMails.sent / 100));
 
 	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
 	await redis.storeData(token, "raw.google", "mail", { received: mails[0], sent: mails[1] })
