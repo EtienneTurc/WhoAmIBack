@@ -8,24 +8,28 @@ const { getJwtToken } = require("../utils/login")
 
 
 router.get("/loggedTo", async (req, res) => {
-	console.log(
-		"logged to ",
-		config.services.filter(s => s in req.session)
-	);
+	let tokens = await redis.retrieveData(req.session.token, "", "tokens")
 
-	res.send(config.services.filter(s => s in req.session));
+	let services = []
+	for (let service in tokens) {
+		if (tokens[service]) {
+			services.push(service)
+		}
+	}
+
+	res.send(services);
 });
 
 // Req.body.services Array of String
 // Ex: ['facebook', 'google']
 router.post("/logout", async (req, res) => {
+	let promises = []
 	for (let service of req.body.services) {
-		if (config.services.includes(service) && req.session[service]) {
-			delete req.session[service];
-			req.session.save();
-		}
+		promises.push(redis.storeData(req.session.token, "tokens", service, ""))
 	}
-	res.send(config.services.filter(s => s in req.session));
+	await Promise.all(promises)
+
+	res.sendStatus(200);
 });
 
 router.get("/googleToken", async (req, res) => {
