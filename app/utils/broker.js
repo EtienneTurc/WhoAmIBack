@@ -26,6 +26,6 @@ const broker = createClient()
 
 module.exports = { broker }
 
-// require("../google/fetch/gmail")
+require("../google/fetch/gmail")
 require("../google/fetch/people")
 require("../facebook/facebook.js")

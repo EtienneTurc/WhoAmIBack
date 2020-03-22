@@ -1,5 +1,6 @@
 const axios = require("axios")
 const htmlToText = require("html-to-text");
+const unidecode = require("unidecode")
 
 const config = require("../../../config/config");
 const redis = require("../../redis/redis")
@@ -13,13 +14,13 @@ let decodeBase64 = content => {
 };
 
 let cleanBody = str => {
-	return str
+	return unidecode(str
 		.split(/https?[^\s]+/g)
 		.join("")
 		.split("\r")
 		.join(" ")
 		.split(/ +/g)
-		.join(" ");
+		.join(" "))
 };
 
 let parseHtml = function (text) {
@@ -57,10 +58,10 @@ let filterMails = mails => {
 		if (!e.body.payload) {
 		} else {
 			filtered.push({
-				snippet: e.body.snippet,
+				snippet: cleanBody(e.body.snippet),
 				status: e.status,
 				date: e.body.internalDate,
-				headers: e.body.payload.headers.filter(h => headers.includes(h.name)),
+				headers: e.body.payload.headers.filter(h => headers.includes(h.name)).map(el => JSON.parse(unidecode(JSON.stringify(el)))),
 				body: cleanBody(parseHtml(decodeBase64(e.body.payload.body.data || ""))) + " " + part
 			});
 		}
@@ -123,8 +124,8 @@ let getAndStoreMails = async function (token) {
 	var mailsReceived = await allMails(["INBOX"], googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
 	var mailsSent = await allMails(["SENT"], googleToken, Math.ceil(config.numberMails.sent / 100));
 
-	mails = [filterMails(mailsReceived), filterMails(mailsSent)];
-	await redis.storeData(token, "raw.google", "mail", { received: mails[0], sent: mails[1] })
+	let mails = { received: filterMails(mailsReceived), sent: filterMails(mailsSent) }
+	await redis.storeData(token, "raw.google", "mail", mails)
 
 	broker.publish("raw/google/mail", "done")
 };
