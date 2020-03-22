@@ -1,6 +1,5 @@
-const redis = require("../../redis/redis")
+const redis = require("../redis/redis")
 const { broker } = require("../utils/broker")
-
 
 let getDistribution = mails => {
 	return mails.map(function (m) {
@@ -20,8 +19,8 @@ let analyseMails = async function (token) {
 		distribution: getDistribution(mails.sent)
 	};
 
-	await redis.setData(token, "toDisplay.mails", "data", { received: received, sent: sent })
-	broker.publish("toDisplay/mails")
+	await redis.storeData(token, "toDisplay.mails", "data", { received: received, sent: sent })
+	broker.publish("toDisplay/mails", JSON.stringify({ token: token }))
 };
 
 broker.listenTo("raw/google/mail", analyseMails)

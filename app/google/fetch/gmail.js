@@ -127,7 +127,7 @@ let getAndStoreMails = async function (token) {
 	let mails = { received: filterMails(mailsReceived), sent: filterMails(mailsSent) }
 	await redis.storeData(token, "raw.google", "mail", mails)
 
-	broker.publish("raw/google/mail", "done")
+	broker.publish("raw/google/mail", JSON.stringify({ token: token }))
 };
 
 broker.listenTo("start/google/mail", getAndStoreMails)

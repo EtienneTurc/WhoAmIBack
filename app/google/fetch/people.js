@@ -51,7 +51,7 @@ let getAndStorePeople = async function (token) {
 
 	let filter = filterPeople(res.data)
 	await redis.storeData(token, "raw.google", "people", filter)
-	broker.publish("raw/google/people", 'done')
+	broker.publish("raw/google/people", JSON.stringify({ token: token }))
 }
 
 broker.listenTo("start/google/people", getAndStorePeople)

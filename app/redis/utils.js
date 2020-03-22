@@ -18,3 +18,14 @@ exports.getData = function (client, token, path) {
 		})
 	});
 }
+
+exports.exists = function (client, token) {
+	return new Promise(function (resolve, reject) {
+		client.send_command('EXISTS', [token], (err, res) => {
+			if (err)
+				reject(err)
+
+			resolve(res == 1)
+		})
+	});
+}

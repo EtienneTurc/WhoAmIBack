@@ -39,7 +39,8 @@ router.get("/googleToken", async (req, res) => {
 		let { tokens } = await google.oauth2Client.getToken(req.query.code);
 		if (tokens) {
 			let token = req.session.token
-			if (!req.session.token) {
+			let userExists = await redis.checkIfUserExists(token)
+			if (!req.session.token || !userExists) {
 				// TODO
 				token = getJwtToken("etienne.turc@gmail.com")
 				await redis.createNewUser(token)
@@ -75,10 +76,11 @@ router.get("/facebookToken", async (req, res) => {
 
 		if (response.data) {
 			let token = req.session.token
-			if (!req.session.token) {
+			let userExists = await redis.checkIfUserExists(token)
+			if (!req.session.token || !userExists) {
 				// TODO
 				token = getJwtToken("etienne.turc@gmail.com")
-				await redis.createNewSession(token)
+				await redis.createNewUser(token)
 				req.session.token = token
 				req.session.save()
 			}
