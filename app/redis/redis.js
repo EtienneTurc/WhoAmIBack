@@ -26,9 +26,16 @@ let storeProcessing = function (token, service, subservice) {
 }
 
 let retrieveData = function (token, path, key) {
-	path = path.replace(/^\./, '');
-	path = path.replace(/\.$/, '');
-	return getData(client, token, `${path}.${key}`)
+	path = trimPoint(path)
+	key = trimPoint(key)
+	let p = trimPoint(`${path}.${key}`)
+	return getData(client, token, p)
+}
+
+let trimPoint = function (str) {
+	str = str.replace(/^\./, '');
+	str = str.replace(/\.$/, '');
+	return str
 }
 
 module.exports = { createNewUser, checkIfUserExists, storeData, retrieveData, storeProcessing }

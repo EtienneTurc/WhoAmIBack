@@ -9,17 +9,19 @@ const utils = require("../utils/utils")
 
 
 router.get("/loggedTo", async (req, res) => {
-	// let tokens = await redis.retrieveData(req.session.token, "", "tokens")
+	let services = []
 
-	// let services = []
-	// for (let service in tokens) {
-	// 	if (tokens[service]) {
-	// 		services.push(service)
-	// 	}
-	// }
-	// res.send(services);
-	res.send([])
+	let userExists = await redis.checkIfUserExists(req.session.token)
+	if (userExists) {
+		let tokens = await redis.retrieveData(req.session.token, "", "tokens")
 
+		for (let service in tokens) {
+			if (tokens[service]) {
+				services.push(service)
+			}
+		}
+	}
+	res.send(services);
 });
 
 // Req.body.services Array of String
