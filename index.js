@@ -5,6 +5,7 @@ const config = require("./config/config");
 const cors = require("cors");
 const MongoStore = require("connect-mongo")(session);
 const bodyParser = require("body-parser");
+const broker = require("./app/utils/broker")
 
 const { checkGoogleLogin } = require("./app/google/google");
 
@@ -30,7 +31,7 @@ app.use(
 );
 
 app.use("/login", require("./app/routes/login"));
-app.use("/component", checkGoogleLogin, require("./app/routes/proxy"))
+app.use("/component", require("./app/routes/proxy"))
 
 app.use((err, req, res, next) => {
 	if (res.headersSent) return next(err);

@@ -1,17 +1,11 @@
-const { google } = require("googleapis");
-const { oauth2Client } = require("../google");
+const axios = require("axios")
+const htmlToText = require("html-to-text");
+
 const config = require("../../../config/config");
 const redis = require("../../redis/redis")
 const utils = require("../../utils/utils");
 const { broker } = require("../../utils/broker")
 
-
-const gmail = google.gmail({
-	version: "v1",
-	auth: oauth2Client
-});
-
-const htmlToText = require("html-to-text");
 
 let decodeBase64 = content => {
 	let buf = Buffer.from(content, "base64"); // Ta-da
@@ -52,6 +46,7 @@ let getPartsData = function (parts) {
 	}
 	return data
 }
+
 let filterMails = mails => {
 	let filtered = [];
 	let headers = ["From", "To", "Subject"];
@@ -104,8 +99,7 @@ let allMails = async (labelIds, token, steps) => {
 		if (i != 0) {
 			queries.pageToken = res.data.nextPageToken;
 		}
-
-		res = await gmail.users.messages.list(queries);
+		res = await axios.get("https://www.googleapis.com/gmail/v1/users/me/messages", { headers: { Authorization: "Bearer " + token }, params: { queries } })
 		if (res.data.resultSizeEstimate) {
 			let batch = utils.createBatch(
 				"https://www.googleapis.com/batch",
@@ -125,6 +119,7 @@ let allMails = async (labelIds, token, steps) => {
 
 let getAndStoreMails = async function (token) {
 	let googleToken = await redis.retrieveData(token, "tokens", "google")
+
 	var mailsReceived = await allMails(["INBOX"], googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
 	var mailsSent = await allMails(["SENT"], googleToken, Math.ceil(config.numberMails.sent / 100));
 

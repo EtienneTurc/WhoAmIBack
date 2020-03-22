@@ -14,7 +14,7 @@ exports.getData = function (client, token, path) {
 			if (err)
 				reject(err)
 
-			resolve(res)
+			resolve(JSON.parse(res))
 		})
 	});
 }

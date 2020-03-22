@@ -7,19 +7,25 @@ let createClient = function () {
 		// 	client.subscribe(sub)
 		// }
 
-		client.listenTo = function (channel, callback) {
-			client.on('message', function (topic, message) {
-				if (topic == channel) {
-					let token = JSON.parse(message).token
-					callback(token)
-				}
-			})
-		}
-		return client
 	})
+	client.listenTo = function (channel, callback) {
+		client.subscribe(channel)
+		client.on('message', function (topic, message) {
+			// console.log("topic", topic)
+			// console.log("message", message)
+			if (topic == channel) {
+				let token = JSON.parse(message).token
+				callback(token)
+			}
+		})
+	}
+	return client
 }
 
 const broker = createClient()
 
-
 module.exports = { broker }
+
+// require("../google/fetch/gmail")
+require("../google/fetch/people")
+require("../facebook/facebook.js")
