@@ -23,28 +23,50 @@
 	},
 	"toDisplay": {
 		"id": {
-			"meta": {}
+			"data": {},
+			"meta": {
+				"processing": {}
+			}
 		},
 		"mails": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		},
 		"words": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		},
 		"lydia": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
+		},
+		"amazon": {
+			"meta": {
+				"processing": {}
+			}
 		},
 		"doctolib": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		},
 		"uberRides": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		},
 		"uberEats": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		},
 		"uberBike": {
-			"meta": {}
+			"meta": {
+				"processing": {}
+			}
 		}
 	}
 }

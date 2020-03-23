@@ -1,5 +1,6 @@
 const redis = require("../redis/redis")
 const { broker } = require("../utils/broker")
+const utils = require("../utils/utils")
 
 let getDistribution = mails => {
 	return mails.map(function (m) {
@@ -20,7 +21,9 @@ let analyseMails = async function (token) {
 			distribution: getDistribution(mails.sent)
 		};
 
-		await redis.storeData(token, "toDisplay.mails", "data", { received: received, sent: sent })
+		await redis.storeJson(token, "toDisplay.mails", "data", { received: received, sent: sent })
+		utils.stopProcessing(token, "toDisplay.mails", "google", "mail")
+
 		broker.publish("toDisplay/mails", JSON.stringify({ token: token }))
 	} catch (err) {
 		console.log(err)

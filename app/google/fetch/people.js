@@ -51,7 +51,7 @@ let getAndStorePeople = async function (token) {
 		const res = await axios.get("https://people.googleapis.com/v1/people/me", { headers: { Authorization: "Bearer " + googleToken }, params: { personFields: information.join(",") } })
 
 		let filter = filterPeople(res.data)
-		await redis.storeData(token, "raw.google", "people", filter)
+		await redis.storeJson(token, "raw.google", "people", filter)
 		broker.publish("raw/google/people", JSON.stringify({ token: token }))
 	} catch (err) {
 		console.log(err)

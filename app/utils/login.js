@@ -9,8 +9,7 @@ let getJwtToken = function (mail) {
 }
 
 let checkLogin = async function (req, res, next) {
-	let userExists = redis.checkIfUserExists(req.session.token)
-	if (!req.session.token || !userExists) {
+	if (!req.session.token || !(await redis.userExists(req.session.token))) {
 		res.sendStatus(401)
 	} else {
 		next()

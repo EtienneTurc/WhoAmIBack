@@ -92,15 +92,12 @@ let allMails = async (labelIds, token, steps) => {
 	let res;
 	let i = 0;
 	while (i == 0 || (res.data.nextPageToken && (i < steps || steps == -1))) {
-		let queries = {
-			userId: "me",
-			labelIds: labelIds
-		};
+		let queries = "labelIds=" + labelIds;
 
 		if (i != 0) {
-			queries.pageToken = res.data.nextPageToken;
+			queries += "&pageToken=" + res.data.nextPageToken;
 		}
-		res = await axios.get("https://www.googleapis.com/gmail/v1/users/me/messages", { headers: { Authorization: "Bearer " + token }, params: { queries } })
+		res = await axios.get("https://www.googleapis.com/gmail/v1/users/me/messages?" + queries, { headers: { Authorization: "Bearer " + token } })
 		if (res.data.resultSizeEstimate) {
 			let batch = utils.createBatch(
 				"https://www.googleapis.com/batch",
@@ -122,11 +119,13 @@ let getAndStoreMails = async function (token) {
 	try {
 		let googleToken = await redis.retrieveData(token, "tokens", "google")
 
-		var mailsReceived = await allMails(["INBOX"], googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
-		var mailsSent = await allMails(["SENT"], googleToken, Math.ceil(config.numberMails.sent / 100));
+		var mailsReceived = await allMails("INBOX", googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
+		var mailsSent = await allMails("SENT", googleToken, Math.ceil(config.numberMails.sent / 100));
+
 
 		let mails = { received: filterMails(mailsReceived), sent: filterMails(mailsSent) }
-		await redis.storeData(token, "raw.google", "mail", mails)
+
+		await redis.storeJson(token, "raw.google", "mail", mails)
 
 		broker.publish("raw/google/mail", JSON.stringify({ token: token }))
 	} catch (error) {

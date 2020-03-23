@@ -53,7 +53,9 @@
 						"Google",
 						"Facebook"
 					],
-					"processing": true,
+					"processing": {
+						"rawGoogleMail": true
+					},
 					"available": false,
 					"done": false,
 					"error": false

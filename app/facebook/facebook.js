@@ -12,7 +12,7 @@ let getAndStoreUser = async function (token) {
 				access_token: facebookToken
 			}
 		});
-		await redis.storeData(token, "raw.facebook", "user", me.data)
+		await redis.storeJson(token, "raw.facebook", "user", me.data)
 		broker.publish("raw/facebook/user", JSON.stringify({ token: token }))
 	} catch (err) {
 		console.log(err)

@@ -27,7 +27,7 @@ router.get("/loggedTo", async (req, res) => {
 router.post("/logout", async (req, res) => {
 	let promises = [];
 	for (let service of req.body.services) {
-		promises.push(redis.storeData(req.session.token, "tokens", service, ""));
+		promises.push(redis.storeJson(req.session.token, "tokens", service, ""));
 	}
 	await Promise.all(promises);
 
@@ -40,13 +40,13 @@ router.get("/googleToken", async (req, res) => {
 		if (tokens) {
 			let token = req.session.token;
 			if (!token || !(await redis.userExists(token))) {
-				token = getJwtToken("etienne.turc@gmail.com");
+				token = getJwtToken("blabla.io");
 				await redis.createNewUser(token);
 				req.session.token = token;
 				req.session.save();
 			}
 
-			await redis.storeData(token, "tokens", "google", tokens.access_token);
+			await redis.storeJson(token, "tokens", "google", tokens.access_token);
 			utils.startProcessing(token);
 
 			res.sendStatus(200);
@@ -76,13 +76,13 @@ router.get("/facebookToken", async (req, res) => {
 		if (response.data) {
 			let token = req.session.token;
 			if (!token || !(await redis.userExists(token))) {
-				token = getJwtToken("etienne.turc@gmail.com");
+				token = getJwtToken("blabla.io");
 				await redis.createNewUser(token);
 				req.session.token = token;
 				req.session.save();
 			}
 
-			await redis.storeData(
+			await redis.storeJson(
 				token,
 				"tokens",
 				"facebook",

@@ -1,7 +1,6 @@
 const redis = require("redis");
 const client = redis.createClient();
 const store = require("../../config/store.json")
-const services = require("../../config/services")
 
 const { setData, getData, exists } = require("./utils")
 
@@ -13,16 +12,23 @@ let userExists = function (token) {
 	return exists(client, token)
 }
 
-let storeData = function (token, path, key, value) {
-	path = path.replace(/^\./, '');
-	path = path.replace(/\.$/, '');
-	return setData(client, token, `${path}.${key}`, value)
+let storeJson = function (token, path, key, value) {
+	path = trimPoint(path)
+	key = trimPoint(key)
+	let p = trimPoint(`${path}.${key}`)
+	return setData(client, token, p, value)
 }
 
-let storeProcessing = function (token, service, subservice) {
-	for (let s of services[service][subservice]) {
-		setData(client, token, `toDisplay.${s}.meta`, { processing: true })
+let addDataToStore = function (token, path, key, value) {
+	path = trimPoint(path)
+	key = trimPoint(key)
+	let p = trimPoint(`${path}.${key}`)
+
+	promises = []
+	for (let v in value) {
+		promises.push(setData(client, token, `${p}.${v}`, value[v]))
 	}
+	return Promise.all(promises)
 }
 
 let retrieveData = function (token, path, key) {
@@ -38,4 +44,4 @@ let trimPoint = function (str) {
 	return str
 }
 
-module.exports = { createNewUser, userExists, storeData, retrieveData, storeProcessing }
+module.exports = { createNewUser, userExists, storeJson, addDataToStore, retrieveData }
