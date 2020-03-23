@@ -2,7 +2,7 @@ exports.setData = function (client, token, path, value) {
 	return new Promise(function (resolve, reject) {
 		client.send_command('JSON.SET', [token, "." + path, JSON.stringify(value)], (err, res) => {
 			if (err) reject(err)
-
+			// console.log(path, value)
 			resolve()
 		})
 	})
@@ -21,11 +21,15 @@ exports.getData = function (client, token, path) {
 
 exports.exists = function (client, token) {
 	return new Promise(function (resolve, reject) {
-		client.send_command('EXISTS', [token], (err, res) => {
-			if (err)
-				reject(err)
+		if (!token) {
+			resolve(0)
+		} else {
+			client.send_command('EXISTS', [token], (err, res) => {
+				if (err)
+					reject(err)
 
-			resolve(res == 1)
-		})
+				resolve(res == 1)
+			})
+		}
 	});
 }

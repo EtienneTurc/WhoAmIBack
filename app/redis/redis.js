@@ -9,7 +9,7 @@ let createNewUser = function (token) {
 	return setData(client, token, "", store)
 }
 
-let checkIfUserExists = function (token) {
+let userExists = function (token) {
 	return exists(client, token)
 }
 
@@ -38,4 +38,4 @@ let trimPoint = function (str) {
 	return str
 }
 
-module.exports = { createNewUser, checkIfUserExists, storeData, retrieveData, storeProcessing }
+module.exports = { createNewUser, userExists, storeData, retrieveData, storeProcessing }
