@@ -10,6 +10,8 @@ const { checkLogin } = require("./app/utils/login");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(require("helmet")());
 app.use(cors({ credentials: true, origin: true }));
@@ -29,17 +31,15 @@ app.use(
 	})
 );
 
-app.use("/login", require("./app/routes/login"));
-app.use("/component", checkLogin, require("./app/routes/proxy"))
-
 app.use((err, req, res, next) => {
 	if (res.headersSent) return next(err);
 	console.error(err.status, err.message);
 	res.status(err.status || 500).json({ message: err.message || err });
 });
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use("/login", require("./app/routes/login"));
+app.use("/component", checkLogin, require("./app/routes/proxy"))
+
 
 app.listen(config.port, function () {
 	console.log("Server running on port " + config.port);

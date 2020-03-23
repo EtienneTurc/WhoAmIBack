@@ -8,19 +8,23 @@ let getDistribution = mails => {
 };
 
 let analyseMails = async function (token) {
-	let mails = await redis.retrieveData(token, "raw.google", "mail")
+	try {
+		let mails = await redis.retrieveData(token, "raw.google", "mail")
 
-	let received = {
-		number: mails.received.length,
-		distribution: getDistribution(mails.received)
-	};
-	let sent = {
-		number: mails.sent.length,
-		distribution: getDistribution(mails.sent)
-	};
+		let received = {
+			number: mails.received.length,
+			distribution: getDistribution(mails.received)
+		};
+		let sent = {
+			number: mails.sent.length,
+			distribution: getDistribution(mails.sent)
+		};
 
-	await redis.storeData(token, "toDisplay.mails", "data", { received: received, sent: sent })
-	broker.publish("toDisplay/mails", JSON.stringify({ token: token }))
+		await redis.storeData(token, "toDisplay.mails", "data", { received: received, sent: sent })
+		broker.publish("toDisplay/mails", JSON.stringify({ token: token }))
+	} catch (err) {
+		console.log(err)
+	}
 };
 
 broker.listenTo("raw/google/mail", analyseMails)

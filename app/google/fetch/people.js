@@ -45,13 +45,17 @@ let filterPeople = people => {
 }
 
 let getAndStorePeople = async function (token) {
-	let googleToken = await redis.retrieveData(token, "tokens", "google")
+	try {
+		let googleToken = await redis.retrieveData(token, "tokens", "google")
 
-	const res = await axios.get("https://people.googleapis.com/v1/people/me", { headers: { Authorization: "Bearer " + googleToken }, params: { personFields: information.join(",") } })
+		const res = await axios.get("https://people.googleapis.com/v1/people/me", { headers: { Authorization: "Bearer " + googleToken }, params: { personFields: information.join(",") } })
 
-	let filter = filterPeople(res.data)
-	await redis.storeData(token, "raw.google", "people", filter)
-	broker.publish("raw/google/people", JSON.stringify({ token: token }))
+		let filter = filterPeople(res.data)
+		await redis.storeData(token, "raw.google", "people", filter)
+		broker.publish("raw/google/people", JSON.stringify({ token: token }))
+	} catch (err) {
+		console.log(err)
+	}
 }
 
 broker.listenTo("start/google/people", getAndStorePeople)
