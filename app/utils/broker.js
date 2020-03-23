@@ -11,8 +11,6 @@ let createClient = function () {
 	client.listenTo = function (channel, callback) {
 		client.subscribe(channel)
 		client.on('message', function (topic, message) {
-			// console.log("topic", topic)
-			// console.log("message", message)
 			if (topic == channel) {
 				let token = JSON.parse(message).token
 				callback(token)
