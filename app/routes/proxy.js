@@ -67,7 +67,7 @@ router.get("/map", async (req, res) => {
 	let data = Promise.all(promises)
 
 	let mapKeysAugmented = mapKeys.concat(["addresses"])
-	let response = formatResponse(data, mapDataAugmented)
+	let response = formatResponse(data, mapKeysAugmented)
 	res.send(response)
 })
 
