@@ -7,7 +7,7 @@ let getPromiseData = function (token, keys) {
 		promises.push(redis.retrieveData(token, "toDisplay", d))
 	}
 
-	return promises
+	return Promise.all(promises)
 }
 
 let getMeta = function (data) {
@@ -54,7 +54,7 @@ router.get('/id', async (req, res) => {
 
 const dashboardKeys = ["mails", "lydia", "amazon"]
 router.get('/dashboard', async (req, res) => {
-	let data = await Promise.all(getPromiseData(req.session.token, dashboardKeys))
+	let data = await getPromiseData(req.session.token, dashboardKeys)
 
 	let response = formatResponse(data, dashboardKeys)
 	res.send(response)
@@ -62,18 +62,20 @@ router.get('/dashboard', async (req, res) => {
 
 const mapKeys = ["uberRides", "uberEats", "uberBikes"]
 router.get("/map", async (req, res) => {
-	let promises = getPromiseData(req.session.token, mapKeys)
-	promises.push(redis.retrieveData(req.session.token, "toDisplay.id", addresses))
-	let data = Promise.all(promises)
+	let data = await getPromiseData(req.session.token, mapKeys)
+	let addresses = await redis.retrieveData(req.session.token, "toDisplay.id.data", "addresses")
+	console.log(addresses)
 
-	let mapKeysAugmented = mapKeys.concat(["addresses"])
-	let response = formatResponse(data, mapKeysAugmented)
+	let response = formatResponse(data, mapKeys)
+	response.data.addresses = { data: addresses }
+
+	console.log(response)
 	res.send(response)
 })
 
 const wordsKeys = ["words"]
 router.get("/words", async (req, res) => {
-	let data = await Promise.all(getPromiseData(req.session.token, wordsKeys))
+	let data = await getPromiseData(req.session.token, wordsKeys)
 
 	let response = formatResponse(data, wordsKeys)
 	res.send(response)
