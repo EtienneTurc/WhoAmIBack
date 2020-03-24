@@ -122,11 +122,9 @@ let getAndStoreMails = async function (token) {
 		var mailsReceived = await allMails("INBOX", googleToken, Math.ceil(config.numberMails.received / 100)); // last variable = number of mails to get * 100
 		var mailsSent = await allMails("SENT", googleToken, Math.ceil(config.numberMails.sent / 100));
 
-
 		let mails = { received: filterMails(mailsReceived), sent: filterMails(mailsSent) }
 
 		await redis.storeJson(token, "raw.google", "mail", mails)
-
 		broker.publish("raw/google/mail", JSON.stringify({ token: token }))
 	} catch (error) {
 		console.log(error)
