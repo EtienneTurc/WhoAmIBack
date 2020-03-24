@@ -9,7 +9,7 @@ const { broker } = require("../../utils/broker")
 
 
 let decodeBase64 = content => {
-	let buf = Buffer.from(content, "base64"); // Ta-da
+	let buf = Buffer.from(content, "base64");
 	return buf.toString();
 };
 
@@ -61,7 +61,7 @@ let filterMails = mails => {
 				snippet: cleanBody(e.body.snippet),
 				status: e.status,
 				date: e.body.internalDate,
-				headers: e.body.payload.headers.filter(h => headers.includes(h.name)).map(el => JSON.parse(unidecode(JSON.stringify(el)))),
+				headers: e.body.payload.headers.filter(h => headers.includes(h.name)).map((el) => { return { name: unidecode(el.name), value: unidecode(el.value) } }),
 				body: cleanBody(parseHtml(decodeBase64(e.body.payload.body.data || ""))) + " " + part
 			});
 		}
