@@ -1,6 +1,5 @@
 const axios = require("axios")
 const htmlToText = require("html-to-text");
-const unidecode = require("unidecode")
 
 const config = require("../../../config/config");
 const redis = require("../../redis/redis")
@@ -14,13 +13,13 @@ let decodeBase64 = content => {
 };
 
 let cleanBody = str => {
-	return unidecode(str
+	return str
 		.split(/https?[^\s]+/g)
 		.join("")
 		.split("\r")
 		.join(" ")
 		.split(/ +/g)
-		.join(" "))
+		.join(" ")
 };
 
 let parseHtml = function (text) {
@@ -61,7 +60,7 @@ let filterMails = mails => {
 				snippet: cleanBody(e.body.snippet),
 				status: e.status,
 				date: e.body.internalDate,
-				headers: e.body.payload.headers.filter(h => headers.includes(h.name)).map((el) => { return { name: unidecode(el.name), value: unidecode(el.value) } }),
+				headers: e.body.payload.headers.filter(h => headers.includes(h.name)),
 				body: cleanBody(parseHtml(decodeBase64(e.body.payload.body.data || ""))) + " " + part
 			});
 		}

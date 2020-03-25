@@ -1,3 +1,5 @@
+const utf8 = require('utf8');
+
 exports.setData = function (client, token, path, value) {
 	return new Promise(function (resolve, reject) {
 		client.send_command('JSON.SET', [token, "." + path, JSON.stringify(value)], (err, res) => {
@@ -14,7 +16,13 @@ exports.getData = function (client, token, path) {
 			if (err)
 				reject(err)
 
-			resolve(JSON.parse(res))
+			let response = JSON.parse(res, (key, value) => {
+				if (typeof value === "string") {
+					return utf8.decode(value)
+				}
+				return value
+			})
+			resolve(response)
 		})
 	});
 }
