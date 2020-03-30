@@ -1,22 +1,18 @@
 {
-	"facebook": {
-		"user": [
-			"id"
-		]
-	},
-	"google": {
-		"people": [
-			"id"
-		],
-		"mail": [
-			"mails",
-			"words",
-			"lydia",
-			"doctolib",
-			"uberRides",
-			"uberEats",
-			"uberBike"
-		],
-		"drive": []
-	}
+  "facebook": {
+    "user": ["id"]
+  },
+  "google": {
+    "people": ["id"],
+    "mail": [
+      "mails",
+      "words",
+      "lydia",
+      "doctolib",
+      "uberRides",
+      "uberEats",
+      "uberBikes"
+    ],
+    "drive": []
+  }
 }

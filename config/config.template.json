@@ -1,27 +1,25 @@
 {
-	"jwtSecret": "Pasboum",
-	"sessionSecret": "Youplaboum",
-	"storeSecret": "Badaboum",
-	"url": "http://locahost:8001",
-	"flaskUrl": "http://localhost:5000",
-	"frontUrl": "http://localhost:8080",
-	"services": [
-		"google",
-		"facebook"
-	],
-	"google": {
-		"clientID": "967740284660-2is97nrb2amf2lafdtjnra4hu04ou51f.apps.googleusercontent.com",
-		"clientSecret": "Archiboum",
-		"redirectUrl": "https://local-redirect.data-ensta.fr/oauthGoogle?port=8080"
-	},
-	"facebook": {
-		"clientID": "287942492167943",
-		"clientSecret": "Pataboum",
-		"redirectUrl": "https://local-redirect.data-ensta.fr/oauthFacebook?port=8080"
-	},
-	"numberMails": {
-		"received": 1000,
-		"sent": 1000
-	},
-	"port": 8001
+  "jwtSecret": "Pasboum",
+  "sessionSecret": "Youplaboum",
+  "storeSecret": "Badaboum",
+  "url": "http://locahost:8001",
+  "flaskUrl": "http://localhost:5000",
+  "frontUrl": "http://localhost:8080",
+  "services": ["google", "facebook"],
+  "google": {
+    "clientID": "967740284660-2is97nrb2amf2lafdtjnra4hu04ou51f.apps.googleusercontent.com",
+    "clientSecret": "Archiboum",
+    "redirectUrl": "https://local-redirect.data-ensta.fr/oauthGoogle?port=8080"
+  },
+  "facebook": {
+    "clientID": "287942492167943",
+    "clientSecret": "Pataboum",
+    "redirectUrl": "https://local-redirect.data-ensta.fr/oauthFacebook?port=8080"
+  },
+  "numberMails": {
+    "received": 1000,
+    "sent": 1000
+  },
+  "port": 8001,
+  "redisTTL": 600
 }
