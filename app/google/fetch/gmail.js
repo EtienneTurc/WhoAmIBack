@@ -87,7 +87,7 @@ let allMails = async (labelIds, token, steps) => {
 	if (!steps) {
 		return []
 	}
-	let mails_promises = [];
+	let mails = [];
 	let res;
 	let i = 0;
 	while (i == 0 || (res.data.nextPageToken && (i < steps || steps == -1))) {
@@ -103,14 +103,15 @@ let allMails = async (labelIds, token, steps) => {
 				"POST",
 				token
 			);
-			mails_promises.push(getMailContent(batch, res.data.messages));
+			let m = await getMailContent(batch, res.data.messages);
+			mails = mails.concat(m)
 		}
 
 		i++;
 	}
 
-	let mails = await Promise.all(mails_promises);
-	mails = [].concat.apply([], mails);
+	// let mails = await Promise.all(mails_promises);
+	// mails = [].concat.apply([], mails);
 	return mails;
 };
 
