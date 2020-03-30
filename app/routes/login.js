@@ -45,7 +45,7 @@ router.get("/googleToken", async (req, res) => {
 		if (tokens) {
 			let token = req.session.token;
 			if (!token || !(await redis.userExists(token))) {
-				token = getJwtToken("blabla.io");
+				token = getJwtToken(tokens.access_token);
 				await redis.createNewUser(token);
 				req.session.token = token;
 				req.session.save();
@@ -81,7 +81,7 @@ router.get("/facebookToken", async (req, res) => {
 		if (response.data) {
 			let token = req.session.token;
 			if (!token || !(await redis.userExists(token))) {
-				token = getJwtToken("blabla.io");
+				token = getJwtToken(response.data.access_token);
 				await redis.createNewUser(token);
 				req.session.token = token;
 				req.session.save();
