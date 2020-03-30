@@ -25,6 +25,11 @@ router.get("/loggedTo", async (req, res) => {
 // Req.body.services Array of String
 // Ex: ['facebook', 'google']
 router.post("/logout", async (req, res) => {
+	if (!req.session.token && await redis.userExists(req.session.token)) {
+		res.sendStatus(200);
+		return
+	}
+
 	let promises = [];
 	for (let service of req.body.services) {
 		promises.push(redis.storeJson(req.session.token, "tokens", service, ""));
