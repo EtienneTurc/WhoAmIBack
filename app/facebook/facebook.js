@@ -8,7 +8,8 @@ let getAndStoreUser = async function (token) {
 
 		let me = await axios.get("https://graph.facebook.com/v6.0/me/", {
 			params: {
-				fields: "first_name,picture.type(large),hometown,location",
+				fields: "picture.type(large)",
+				// fields: "first_name,picture.type(large),hometown,location",
 				access_token: facebookToken
 			}
 		});
