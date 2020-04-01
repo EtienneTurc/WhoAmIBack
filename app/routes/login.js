@@ -1,56 +1,106 @@
-const router = require('express').Router()
+const router = require("express").Router();
+const axios = require("axios");
 
-const config = require("../../config/config.json")
+const config = require("../../config/config.json");
+const redis = require("../redis/redis");
+const google = require("../google/google");
+const { getJwtToken } = require("../utils/login");
+const utils = require("../utils/utils");
 
-const google = require("../google/google")
-const axios = require('axios')
+router.get("/loggedTo", async (req, res) => {
+	let services = [];
 
+	if (await redis.userExists(req.session.token)) {
+		let tokens = await redis.retrieveData(req.session.token, "", "tokens");
 
+		for (let service in tokens) {
+			if (tokens[service]) {
+				services.push(service);
+			}
+		}
+	}
+	res.send(services);
+});
 
-router.get("/google", (req, res) => {
-	let consentUrl = google.getConsentUrl()
-	res.send(consentUrl)
-})
+// Req.body.services Array of String
+// Ex: ['facebook', 'google']
+router.post("/logout", async (req, res) => {
+	if (!req.session.token && await redis.userExists(req.session.token)) {
+		res.sendStatus(200);
+		return
+	}
+
+	let promises = [];
+	for (let service of req.body.services) {
+		promises.push(redis.storeJson(req.session.token, "tokens", service, ""));
+	}
+	await Promise.all(promises);
+
+	res.sendStatus(200);
+});
 
 router.get("/googleToken", async (req, res) => {
 	try {
-		let { tokens } = await google.oauth2Client.getToken(req.query.code)
-		req.session.google = tokens
-		req.session.save()
+		let { tokens } = await google.oauth2Client.getToken(req.query.code);
 		if (tokens) {
-			res.send(tokens)
+			let token = req.session.token;
+			if (!token || !(await redis.userExists(token))) {
+				token = getJwtToken(tokens.access_token);
+				await redis.createNewUser(token);
+				req.session.token = token;
+				req.session.save();
+			}
+
+			await redis.storeJson(token, "tokens", "google", tokens.access_token);
+			utils.startProcessing(token);
+
+			res.sendStatus(200);
 		} else {
-			res.sendStatus(401)
+			res.sendStatus(401);
 		}
 	} catch (err) {
-		console.log(err)
-		res.sendStatus(401)
+		console.log(err);
+		res.sendStatus(401);
 	}
-})
+});
 
 router.get("/facebookToken", async (req, res) => {
 	try {
-		let response = await axios.get("https://graph.facebook.com/v6.0/oauth/access_token", {
-			params: {
-				client_id: config.facebook.clientID,
-				redirect_uri: config.facebook.redirectUrl,
-				client_secret: config.facebook.clientSecret,
-				code: req.query.code,
+		let response = await axios.get(
+			"https://graph.facebook.com/v6.0/oauth/access_token",
+			{
+				params: {
+					client_id: config.facebook.clientID,
+					redirect_uri: config.facebook.redirectUrl,
+					client_secret: config.facebook.clientSecret,
+					code: req.query.code
+				}
 			}
-		})
-
-		req.session.facebook = response.data
-		req.session.save()
+		);
 
 		if (response.data) {
-			res.send(response.data)
+			let token = req.session.token;
+			if (!token || !(await redis.userExists(token))) {
+				token = getJwtToken(response.data.access_token);
+				await redis.createNewUser(token);
+				req.session.token = token;
+				req.session.save();
+			}
+
+			await redis.storeJson(
+				token,
+				"tokens",
+				"facebook",
+				response.data.access_token
+			);
+			res.sendStatus(200);
 		} else {
-			res.sendStatus(401)
+			res.sendStatus(401);
 		}
 	} catch (err) {
 		console.log(err)
-		res.sendStatus(401)
+		res.sendStatus(401);
 	}
-})
+});
 
-module.exports = router
+module.exports = router;

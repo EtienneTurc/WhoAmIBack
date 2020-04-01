@@ -1,15 +1,14 @@
 const { google } = require('googleapis');
-const { oauth2Client } = require('../google')
-const utils = require('../../utils/utils')
+const { oauth2Client } = require('../../google')
 
 const drive = google.drive({
 	version: 'v3',
 	auth: oauth2Client
 });
 
-let getDriveContent = async function (file_id) {
+let getDriveContent = async function (token, file_id) {
 	return drive.files.get({
-		Authorization: oauth2Client.access_token,
+		Authorization: token,
 		fileId: file_id,
 		fields: ["exportLinks", "webContentLink"]
 	})
@@ -45,6 +44,7 @@ let getDriveList = async function (token, parentId = null) {
 		let queries = {
 			pageSize: 1000,
 			fields: "files(id, name, mimeType, parents)",
+			// Authorization: token
 		}
 
 		if (parentId) {

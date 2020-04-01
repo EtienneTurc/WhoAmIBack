@@ -1,0 +1,72 @@
+{
+	"tokens": {
+		"google": "",
+		"facebook": ""
+	},
+	"raw": {
+		"facebook": {
+			"user": {
+				"meta": {}
+			}
+		},
+		"google": {
+			"people": {
+				"meta": {}
+			},
+			"mail": {
+				"meta": {}
+			},
+			"drive": {
+				"meta": {}
+			}
+		}
+	},
+	"toDisplay": {
+		"id": {
+			"data": {},
+			"meta": {
+				"processing": {}
+			}
+		},
+		"mails": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"words": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"lydia": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"amazon": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"doctolib": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"uberRides": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"uberEats": {
+			"meta": {
+				"processing": {}
+			}
+		},
+		"uberBikes": {
+			"meta": {
+				"processing": {}
+			}
+		}
+	}
+}
